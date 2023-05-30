@@ -7,13 +7,16 @@ namespace Snake
     [Serializable]
     public class SnakeMover
     {
-        [SerializeField]
-        private float delay = 0.5f;
+        [field: SerializeField]
+        public Transform Direction { get; private set; }
+        
+        [field: SerializeField]
+        public float Delay { get; private set; } = 0.5f;
 
         [SerializeField]
         private float moveTime = 0.25f;
     
-        private List<Vector3> _partsTargetPosition;
+        public List<Vector3> PartsTargetPosition { get; private set; }
         private List<Quaternion> _partsTargetRotation;
     
         private Snake _snake;
@@ -24,12 +27,12 @@ namespace Snake
         {
             _snake = snake;
         
-            _partsTargetPosition = new List<Vector3>(_snake.Parts.Count);
+            PartsTargetPosition = new List<Vector3>(_snake.Parts.Count);
             _partsTargetRotation = new List<Quaternion>(_snake.Parts.Count);
         
             foreach (var part in _snake.Parts)
             {
-                _partsTargetPosition.Add(part.transform.localPosition);
+                PartsTargetPosition.Add(part.transform.localPosition);
                 _partsTargetRotation.Add(part.transform.localRotation);
             }
         }
@@ -39,21 +42,15 @@ namespace Snake
             var last = _snake.Parts.Count - 1;
             var part = _snake.Parts[last].transform;
 
-            _partsTargetPosition.Add(part.localPosition);
+            PartsTargetPosition.Add(part.localPosition);
             _partsTargetRotation.Add(part.localRotation);
-        }
-
-        public void Move()
-        {
-            MoveCameraTarget();
-            MoveParts();
         }
 
         public bool IsTimeToSetNewTargetPositions()
         {
             _timer += Time.fixedDeltaTime;
 
-            if (_timer < delay)
+            if (_timer < Delay)
             {
                 return false;
             }
@@ -63,28 +60,9 @@ namespace Snake
             return true;
         }
 
-        private void MoveCameraTarget()
+        public void MoveParts()
         {
-            var cameraTarget = _snake.CameraTarget.transform;
-
-            cameraTarget.localPosition = Vector3.MoveTowards
-            (
-                cameraTarget.localPosition,
-                _snake.Parts[0].transform.localPosition + _snake.Direction.forward,
-                Time.fixedDeltaTime / delay
-            );
-
-            cameraTarget.localRotation = Quaternion.RotateTowards
-            (
-                cameraTarget.localRotation, 
-                _snake.Parts[0].transform.localRotation, 
-                Time.fixedDeltaTime / delay * 180
-            );
-        }
-    
-        private void MoveParts()
-        {
-            for (var i = 0; i < _partsTargetPosition.Count; i++)
+            for (var i = 0; i < PartsTargetPosition.Count; i++)
             {
                 var t = Time.fixedDeltaTime / moveTime;
 
@@ -93,7 +71,7 @@ namespace Snake
                 var newPosition = Vector3.MoveTowards
                 (
                     part.localPosition,
-                    _partsTargetPosition[i],
+                    PartsTargetPosition[i],
                     t
                 );
             
@@ -128,7 +106,7 @@ namespace Snake
                 var prevPosition = part.transform.localPosition;
                 var prevRotation = part.transform.localRotation;
 
-                _partsTargetPosition[i] = newPosition;
+                PartsTargetPosition[i] = newPosition;
                 _partsTargetRotation[i] = newRotation;
 
                 newPosition = prevPosition;

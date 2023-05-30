@@ -7,18 +7,25 @@ namespace Snake
     public class Snake : MonoBehaviour
     {
         public event Action OnAddPart;
-    
-        [field: SerializeField]
-        public Transform Direction { get; set; }
+        public event Action OnSettedNewPosition;
 
-        [field: SerializeField]
-        public Transform CameraTarget { get; private set; }
-    
+        public Transform Direction => snakeMover.Direction;
+        
+        public float MoveDelay => snakeMover.Delay;
+        
+        public List<Vector3> PartsTargetPosition => snakeMover.PartsTargetPosition;
+        
+        public Transform Head => Parts[0].transform;
+        public Vector3 HeadTargetPosition => PartsTargetPosition[0];
+        
         [field: SerializeField]
         public List<GameObject> Parts { get; private set; }
 
         [SerializeField]
         private SnakeMover snakeMover;
+        
+        [SerializeField]
+        private CameraMover cameraMover;
 
         [SerializeField]
         private SnakeDirectionController directionController;
@@ -26,6 +33,7 @@ namespace Snake
         private void Awake()
         {
             snakeMover.Construct(this);
+            cameraMover.Construct(this);
             directionController.Construct(this);
         }
 
@@ -41,9 +49,12 @@ namespace Snake
             {
                 directionController.UpdateDirection();
                 snakeMover.SetTargetPositions();
+                
+                OnSettedNewPosition?.Invoke();
             }
 
-            snakeMover.Move();
+            snakeMover.MoveParts();
+            cameraMover.Move();
         }
 
         public void AddPart()
