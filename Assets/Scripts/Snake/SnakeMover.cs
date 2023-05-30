@@ -4,21 +4,26 @@ using UnityEngine;
 
 namespace Snake
 {
+    using System.Linq;
+
     [Serializable]
     public class SnakeMover
     {
+        public List<Vector3Int> PartsTargetPosition { get; private set; }
+
+        public Vector3Int TailPreviousTargetPosition { get; private set; }
+        
         [field: SerializeField]
         public Transform Direction { get; private set; }
-        
+
         [field: SerializeField]
         public float Delay { get; private set; } = 0.5f;
 
         [SerializeField]
         private float moveTime = 0.25f;
-    
-        public List<Vector3> PartsTargetPosition { get; private set; }
+
         private List<Quaternion> _partsTargetRotation;
-    
+
         private Snake _snake;
     
         private float _timer;
@@ -27,23 +32,27 @@ namespace Snake
         {
             _snake = snake;
         
-            PartsTargetPosition = new List<Vector3>(_snake.Parts.Count);
+            PartsTargetPosition = new List<Vector3Int>(_snake.Parts.Count);
             _partsTargetRotation = new List<Quaternion>(_snake.Parts.Count);
         
             foreach (var part in _snake.Parts)
             {
-                PartsTargetPosition.Add(part.transform.localPosition);
-                _partsTargetRotation.Add(part.transform.localRotation);
+                SetPartToTargets(part);
             }
+            
+            _snake.OnAddPart += OnAddPart;
+        }
+
+        private void Dispose()
+        {
+            _snake.OnAddPart -= OnAddPart;
         }
 
         private void OnAddPart()
         {
-            var last = _snake.Parts.Count - 1;
-            var part = _snake.Parts[last].transform;
+            var part = _snake.Parts.Last();
 
-            PartsTargetPosition.Add(part.localPosition);
-            _partsTargetRotation.Add(part.localRotation);
+            SetPartToTargets(part);
         }
 
         public bool IsTimeToSetNewTargetPositions()
@@ -88,30 +97,48 @@ namespace Snake
 
         public void SetTargetPositions()
         {
-            var head = _snake.Parts[0].transform;
+            var head = FloatToInt(_snake.Parts[0].transform.localPosition);
 
-            var forward = _snake.Direction.forward;
+            var forward = FloatToInt(_snake.Direction.forward);
 
-            var newPosition = 
-                head.localPosition 
-                + forward;
+            var newPosition = head + forward;
 
             var newRotation = 
                 Quaternion.LookRotation(forward, Vector3.up);
 
-            for (var i = 0; i < _snake.Parts.Count; i++)
-            {
-                var part = _snake.Parts[i];
+            TailPreviousTargetPosition = PartsTargetPosition.Last();
             
-                var prevPosition = part.transform.localPosition;
-                var prevRotation = part.transform.localRotation;
+            for (var i = 0; i < PartsTargetPosition.Count; i++)
+            {
+                var position = PartsTargetPosition[i];
+                var rotation = _partsTargetRotation[i];
 
                 PartsTargetPosition[i] = newPosition;
                 _partsTargetRotation[i] = newRotation;
 
-                newPosition = prevPosition;
-                newRotation = prevRotation;
+                newPosition = position;
+                newRotation = rotation;
             }
         }
+
+        private void SetPartToTargets(Transform part)
+        {
+            var localPosition = part.transform.localPosition;
+
+            var localPositionInt = FloatToInt(localPosition);
+
+            PartsTargetPosition.Add(localPositionInt);
+            _partsTargetRotation.Add(part.localRotation);
+        }
+
+        private Vector3Int FloatToInt(Vector3 vector3)
+        {
+            return new Vector3Int
+            (
+                (int)vector3.x,
+                (int)vector3.y,
+                (int)vector3.z
+            );
+        } 
     }
 }

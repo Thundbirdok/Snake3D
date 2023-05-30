@@ -30,11 +30,23 @@ namespace Game
         
         private void CheckAppleHit()
         {
-            if (field.Apple.position == snake.HeadTargetPosition)
+            if (Mathf.Abs(field.Apple.position.x - snake.HeadTargetPosition.x) > 0.1f)
             {
-                //snake.Grow();
-                field.SetAppleNewPosition();
+                return;
             }
+            
+            if (Mathf.Abs(field.Apple.position.y - snake.HeadTargetPosition.y) > 0.1f)
+            {
+                return;
+            }
+            
+            if (Mathf.Abs(field.Apple.position.z - snake.HeadTargetPosition.z) > 0.1f)
+            {
+                return;
+            }
+
+            snake.Grow();
+            field.SetAppleNewPosition();
         }
 
         // private void CheckWallHit()

@@ -13,14 +13,14 @@ namespace Snake
         
         public float MoveDelay => snakeMover.Delay;
         
-        public List<Vector3> PartsTargetPosition => snakeMover.PartsTargetPosition;
+        public IReadOnlyList<Transform> Parts => grower.Parts;
+        public List<Vector3Int> PartsTargetPosition => snakeMover.PartsTargetPosition;
         
-        public Transform Head => Parts[0].transform;
+        public Transform Head => grower.Parts[0].transform;
         public Vector3 HeadTargetPosition => PartsTargetPosition[0];
-        
-        [field: SerializeField]
-        public List<GameObject> Parts { get; private set; }
 
+        public Vector3 TailPreviousTargetPosition => snakeMover.TailPreviousTargetPosition;
+        
         [SerializeField]
         private SnakeMover snakeMover;
         
@@ -28,10 +28,14 @@ namespace Snake
         private CameraMover cameraMover;
 
         [SerializeField]
+        private SnakeGrower grower;
+        
+        [SerializeField]
         private SnakeDirectionController directionController;
     
         private void Awake()
         {
+            grower.Construct(this);
             snakeMover.Construct(this);
             cameraMover.Construct(this);
             directionController.Construct(this);
@@ -57,8 +61,9 @@ namespace Snake
             cameraMover.Move();
         }
 
-        public void AddPart()
+        public void Grow()
         {
+            grower.Grow();
             OnAddPart?.Invoke();
         }
     }
