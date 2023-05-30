@@ -1,31 +1,43 @@
-using UnityEngine;
-
-namespace Game
+namespace States
 {
     using Field;
     using Snake;
+    using UnityEngine;
 
-    public class GameState : MonoBehaviour
+    public class PlayingState : State
     {
+        [SerializeField]
+        private GameStateMachine stateMachine;
+        
+        [SerializeField]
+        private GameOverState gameOverState;
+        
         [SerializeField]
         private Field field;
 
         [SerializeField]
         private Snake snake;
 
-        private void OnEnable()
+        public override void Enable()
         {
+            base.Enable();
+            
             snake.OnSettedNewPosition += Check;
+            snake.IsActive = true;
         }
 
-        private void OnDisable()
+        public override void Disable()
         {
+            base.Disable();
+            
+            snake.IsActive = false;
             snake.OnSettedNewPosition -= Check;
         }
 
         private void Check()
         {
             CheckAppleHit();
+            CheckSnakeHit();
         }
         
         private void CheckAppleHit()
@@ -57,15 +69,15 @@ namespace Game
         //     }
         // }
 
-        // private void CheckSnakeHit()
-        // {
-        //     for (var i = 1; i < snake.Body.Count; i++)
-        //     {
-        //         if (snake.Head.Position == snake.Parts[i].transform)
-        //         {
-        //             snake.Die();
-        //         }
-        //     }
-        // }
+        private void CheckSnakeHit()
+        {
+            for (var i = 1; i < snake.PartsTargetPosition.Count; i++)
+            {
+                if (snake.HeadTargetPosition == snake.PartsTargetPosition[i])
+                {
+                    stateMachine.SetState(gameOverState);
+                }
+            }
+        }
     }
 }

@@ -9,6 +9,8 @@ namespace Snake
         public event Action OnAddPart;
         public event Action OnSettedNewPosition;
 
+        public bool IsActive;
+        
         public Transform Direction => snakeMover.Direction;
         
         public float MoveDelay => snakeMover.Delay;
@@ -17,7 +19,7 @@ namespace Snake
         public List<Vector3Int> PartsTargetPosition => snakeMover.PartsTargetPosition;
         
         public Transform Head => grower.Parts[0].transform;
-        public Vector3 HeadTargetPosition => PartsTargetPosition[0];
+        public Vector3Int HeadTargetPosition => PartsTargetPosition[0];
 
         public Vector3 TailPreviousTargetPosition => snakeMover.TailPreviousTargetPosition;
         
@@ -44,11 +46,16 @@ namespace Snake
         private void OnDestroy()
         {
             directionController.Dispose();
-            //snakeMover.Dispose();
+            snakeMover.Dispose();
         }
 
         private void FixedUpdate()
         {
+            if (IsActive == false)
+            {
+                return;
+            }
+            
             if (snakeMover.IsTimeToSetNewTargetPositions())
             {
                 directionController.UpdateDirection();

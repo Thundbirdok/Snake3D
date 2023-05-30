@@ -43,7 +43,7 @@ namespace Snake
             _snake.OnAddPart += OnAddPart;
         }
 
-        private void Dispose()
+        public void Dispose()
         {
             _snake.OnAddPart -= OnAddPart;
         }
