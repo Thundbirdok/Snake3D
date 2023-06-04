@@ -14,9 +14,6 @@ namespace Snake
         [SerializeField]
         private CinemachineVirtualCamera virtualCamera;
 
-        [SerializeField]
-        private Camera camera;
-        
         private Snake _snake;
         
         public void Construct(Snake snake)
@@ -43,13 +40,12 @@ namespace Snake
 
             var cameraTargetPosition = _snake.Head.localPosition;
             var delta = cameraTarget.localPosition - cameraTargetPosition;
-            //var delta = cameraTargetPosition - cameraTarget.localPosition;
-            
+
             cameraTarget.localPosition = cameraTargetPosition;
             cameraTarget.localRotation = _snake.Head.localRotation;
             
             virtualCamera.PreviousStateIsValid = false;
-            //virtualCamera.ForceCameraPosition(cameraTarget, );
+            
             virtualCamera.OnTargetObjectWarped(cameraTarget, delta);
         }
 
