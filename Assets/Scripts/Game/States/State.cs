@@ -1,7 +1,7 @@
-using UnityEngine;
-
-namespace States
+namespace Game.States
 {
+    using UnityEngine;
+
     public abstract class State : MonoBehaviour
     {
         private void Awake() => Disable();

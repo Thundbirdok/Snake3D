@@ -1,6 +1,6 @@
-namespace States
+namespace Game.States
 {
-    using UI;
+    using Game.UI;
     using UnityEngine;
 
     public class GameOverState : State

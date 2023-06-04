@@ -1,8 +1,8 @@
-using Lean.Touch;
-using UnityEngine;
-
-namespace Snake
+namespace Game.Snake
 {
+    using Lean.Touch;
+    using UnityEngine;
+
     public class SnakePlayerInputHandler : SnakeInputHandler
     {
         [SerializeField]

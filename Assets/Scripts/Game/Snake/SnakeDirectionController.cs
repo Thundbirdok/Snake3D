@@ -1,8 +1,8 @@
-using System;
-using UnityEngine;
-
-namespace Snake
+namespace Game.Snake
 {
+    using System;
+    using UnityEngine;
+
     [Serializable]
     public class SnakeDirectionController
     {

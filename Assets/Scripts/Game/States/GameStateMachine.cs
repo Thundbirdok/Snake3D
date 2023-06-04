@@ -1,7 +1,7 @@
-using UnityEngine;
-
-namespace States
+namespace Game.States
 {
+    using UnityEngine;
+
     public class GameStateMachine : MonoBehaviour
     {
         private State _state;

@@ -1,7 +1,6 @@
-using UnityEngine;
-
-namespace Field
+namespace Game.Field
 {
+    using UnityEngine;
     using Random = UnityEngine.Random;
 
     public class Field : MonoBehaviour

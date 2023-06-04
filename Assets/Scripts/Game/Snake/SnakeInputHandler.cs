@@ -1,8 +1,8 @@
-using System;
-using UnityEngine;
-
-namespace Snake
+namespace Game.Snake
 {
+    using System;
+    using UnityEngine;
+
     public abstract class SnakeInputHandler : MonoBehaviour
     {
         public event Action OnUp;

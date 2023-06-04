@@ -1,9 +1,8 @@
-using UnityEngine;
-
-namespace Snake
+namespace Game.Snake
 {
     using System;
     using Cinemachine;
+    using UnityEngine;
 
     [Serializable]
     public class CameraMover

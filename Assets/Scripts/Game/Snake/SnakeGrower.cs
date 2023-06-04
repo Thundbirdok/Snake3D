@@ -1,9 +1,9 @@
-namespace Snake
+namespace Game.Snake
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Field;
+    using Game.Field;
     using UnityEngine;
     using UnityEngine.Pool;
     using Object = UnityEngine.Object;

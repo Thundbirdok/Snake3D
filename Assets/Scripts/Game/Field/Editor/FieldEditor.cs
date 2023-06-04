@@ -1,8 +1,7 @@
-using UnityEditor;
-using UnityEngine;
-
-namespace Field.Editor
+namespace Game.Field.Editor
 {
+    using UnityEditor;
+    using UnityEngine;
     using Editor = UnityEditor.Editor;
 
     [CustomEditor(typeof(Field))]

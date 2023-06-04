@@ -1,7 +1,7 @@
-namespace States
+namespace Game.States
 {
-    using Field;
-    using Snake;
+    using Game.Field;
+    using Game.Snake;
     using UnityEngine;
 
     public class PlayingState : State
