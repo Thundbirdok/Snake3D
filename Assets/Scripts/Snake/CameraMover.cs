@@ -54,14 +54,14 @@ namespace Snake
             cameraTarget.localPosition = Vector3.MoveTowards
             (
                 cameraTarget.localPosition,
-                _snake.Parts[0].transform.localPosition + _snake.Forward,
+                _snake.Head.localPosition + _snake.Forward,
                 Time.fixedDeltaTime / _snake.MoveDelay
             );
 
             cameraTarget.localRotation = Quaternion.RotateTowards
             (
                 cameraTarget.localRotation, 
-                _snake.Parts[0].transform.localRotation,
+                _snake.Head.localRotation,
                 Time.fixedDeltaTime / _snake.MoveDelay * 180
             );
         }
