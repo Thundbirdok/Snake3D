@@ -9,7 +9,7 @@ namespace States
         private GameStateMachine stateMachine;
         
         [SerializeField]
-        private PlayingState playingState;
+        private SetupGameState setupState;
         
         [SerializeField]
         private GameOver gameOverScreen;
@@ -32,6 +32,6 @@ namespace States
             gameOverScreen.OnTryAgain -= OnTryAgain;
         }
 
-        private void OnTryAgain() => stateMachine.SetState(playingState);
+        private void OnTryAgain() => stateMachine.SetState(setupState);
     }
 }

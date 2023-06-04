@@ -12,14 +12,33 @@ namespace Field
         public Vector3Int Size { get; private set; }
 
         [SerializeField]
+        private GameObject wallPrefab;
+        
+        [SerializeField]
         private GameObject applePrefab;
 
-        private bool _isAppleSet;
-        
-        private void Start()
+        private bool _isInitalized;
+
+        public void Setup()
         {
-            InstantiateApple();
+            if (_isInitalized == false)
+            {
+                InstantiateWalls();
+                InstantiateApple();
+                
+                _isInitalized = true;
+            }
+            
             SetAppleNewPosition();
+        }
+
+        public void SetAppleNewPosition()
+        {
+            var x = Random.Range(1, Size.x - 1) + 0.5f;
+            var y = Random.Range(1, Size.y - 1) + 0.5f;
+            var z = Random.Range(1, Size.z - 1) + 0.5f;
+            
+            Apple.localPosition = new Vector3(x, y, z);
         }
 
         private void InstantiateApple()
@@ -32,13 +51,51 @@ namespace Field
             .transform;
         }
 
-        public void SetAppleNewPosition()
+        private void InstantiateWalls()
         {
-            var x = Random.Range(0, Size.x);
-            var y = Random.Range(0, Size.y);
-            var z = Random.Range(0, Size.z);
+            InstantiateWall
+            (
+                new Vector3(0, (float)Size.y / 2, (float)Size.z / 2),
+                Quaternion.Euler(0, 0, -90),
+                (float)Size.z / 10
+            );
             
-            Apple.position = new Vector3(x, y, z);
+            InstantiateWall
+            (
+                new Vector3(Size.x, (float)Size.y / 2, (float)Size.z / 2),
+                Quaternion.Euler(0, 0, 90),
+                (float)Size.z / 10
+            );
+
+            InstantiateWall
+            (
+                new Vector3((float)Size.x / 2, (float)Size.y / 2, 0),
+                Quaternion.Euler(0, 90, 90),
+                (float)Size.z / 10
+            );
+            
+            InstantiateWall
+            (
+                new Vector3((float)Size.x / 2, (float)Size.y / 2, Size.z),
+                Quaternion.Euler(0, 90, -90),
+                (float)Size.z / 10
+            );
+
+            InstantiateWall
+            (
+                new Vector3((float)Size.x / 2, Size.y, (float)Size.z / 2),
+                Quaternion.Euler(0, 0, 180),
+                (float)Size.z / 10
+            );
+        }
+
+        private void InstantiateWall(Vector3 position, Quaternion rotation, float scale)
+        {
+            var wall = Instantiate(wallPrefab, transform);
+            
+            wall.transform.localPosition = position;
+            wall.transform.localRotation = rotation;
+            wall.transform.localScale = scale * Vector3.one;
         }
     }
 }

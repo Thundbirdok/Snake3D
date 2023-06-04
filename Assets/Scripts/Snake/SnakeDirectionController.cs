@@ -9,15 +9,17 @@ namespace Snake
         [SerializeField]
         private SnakeInputHandler snakeInputHandler;
 
-        private Snake _snake;
-
-        private Vector3 _direction;
-    
-        public void Construct(Snake snake)
-        {
-            _snake = snake;
+        public Vector3 Forward { get; private set; }
+        public Vector3 Up { get; private set; }
+        public Vector3 Right { get; private set; }
         
-            _direction = _snake.Direction.forward;
+        private Vector3 _tmpForward;
+        private Vector3 _tmpUp;
+        private Vector3 _tmpRight;
+    
+        public void Construct()
+        {
+            UpdateDirection();
         
             snakeInputHandler.OnUp += RotateUp;
             snakeInputHandler.OnDown += RotateDown;
@@ -33,7 +35,19 @@ namespace Snake
             snakeInputHandler.OnRight -= RotateRight;
         }
 
-        public void UpdateDirection() => _snake.Direction.LookAt(_direction);
+        public void Setup()
+        {
+            _tmpForward = Vector3.forward;
+            _tmpUp = Vector3.up;
+            _tmpRight = Vector3.right;
+        }
+        
+        public void UpdateDirection()
+        {
+            Forward = _tmpForward;
+            Up = _tmpUp;
+            Right = _tmpRight;
+        }
 
         private void RotateUp() => SetNewRotation(0, 1);
         private void RotateDown() => SetNewRotation(0, -1);
@@ -42,24 +56,30 @@ namespace Snake
 
         private void SetNewRotation(int x, int y)
         {
-            var direction = _snake.Direction;
-            var newZAxis = direction.up * y + direction.right * x;
-
-            ClampDirection(ref newZAxis);
-
-            if (direction.forward + newZAxis == Vector3.zero)
+            var newZAxis = Up * y + Right * x;
+            
+            if (Forward + newZAxis == Vector3.zero)
             {
                 return;
             }
 
-            _direction = newZAxis;
-        }
+            Vector3 newYAxis;
+            Vector3 newXAxis;
 
-        private void ClampDirection(ref Vector3 newLocalZAxis)
-        {
-            newLocalZAxis.x = (int)Mathf.Clamp(newLocalZAxis.x, -1, 1);
-            newLocalZAxis.y = (int)Mathf.Clamp(newLocalZAxis.y, -1, 1);
-            newLocalZAxis.z = (int)Mathf.Clamp(newLocalZAxis.z, -1, 1);
+            if (newZAxis.y == 0)
+            {
+                newYAxis = Vector3.up;
+                newXAxis = newZAxis.z != 0 ? Vector3.right * newZAxis.z : Vector3.forward * -newZAxis.x;
+            }
+            else
+            {
+                newYAxis = y != 0 ? Forward * -y : Up;
+                newXAxis = x != 0 ? Forward * -x : Right;
+            }
+
+            _tmpForward = newZAxis;
+            _tmpUp = newYAxis;
+            _tmpRight = newXAxis;
         }
     }
 }

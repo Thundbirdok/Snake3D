@@ -7,12 +7,12 @@ namespace States
         private State _state;
         
         [SerializeField]
-        private PlayingState playingState;
+        private SetupGameState setupGameState;
 
         private void Start()
         {
-            _state = playingState;
-            SetState(playingState);
+            _state = setupGameState;
+            SetState(setupGameState);
         }
 
         public void SetState(State state)
