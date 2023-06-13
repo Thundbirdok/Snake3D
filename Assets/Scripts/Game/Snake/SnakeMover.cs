@@ -4,6 +4,7 @@ namespace Game.Snake
     using System.Collections.Generic;
     using System.Linq;
     using UnityEngine;
+    using Utility;
 
     [Serializable]
     public class SnakeMover
@@ -11,18 +12,18 @@ namespace Game.Snake
         public List<Vector3> PartsTargetPosition { get; private set; }
 
         public Vector3 TailPreviousTargetPosition { get; private set; }
+        
+        public float Delay => timer.Duration;
 
-        [field: SerializeField]
-        public float Delay { get; private set; } = 0.5f;
-
+        [SerializeField]
+        private Timer timer;
+        
         [SerializeField]
         private float moveTime = 0.25f;
 
         private List<Quaternion> _partsTargetRotation;
 
         private Snake _snake;
-
-        private float _timer;
 
         public void Construct(Snake snake)
         {
@@ -41,7 +42,7 @@ namespace Game.Snake
 
         public void Setup()
         {
-            _timer = 0;
+            timer.ResetTime();
             
             if (PartsTargetPosition == null)
             {
@@ -69,19 +70,7 @@ namespace Game.Snake
             SetPartToTargets(part);
         }
 
-        public bool IsTimeToSetNewTargetPositions()
-        {
-            _timer += Time.fixedDeltaTime;
-
-            if (_timer < Delay)
-            {
-                return false;
-            }
-
-            _timer = 0;
-
-            return true;
-        }
+        public bool IsTimeToSetNewTargetPositions() => timer.AddTime(Time.fixedDeltaTime);
 
         public void MoveParts()
         {
