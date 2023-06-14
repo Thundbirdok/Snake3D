@@ -37,7 +37,10 @@ namespace Game.Snake
 
         public void Dispose()
         {
-            _snake.OnAddPart -= OnAddPart;
+            if (_snake != null)
+            {
+                _snake.OnAddPart -= OnAddPart;
+            }
         }
 
         public void Setup()

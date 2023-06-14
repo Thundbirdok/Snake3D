@@ -9,7 +9,7 @@ namespace Game.Snake
         public event Action OnAddPart;
         public event Action OnSettedNewPosition;
 
-        public bool IsActive;
+        public bool IsActive { get; set; }
         
         public Vector3 Forward => directionController.Forward;
         public Vector3 Up => directionController.Up;

@@ -51,7 +51,7 @@ namespace Game.Snake
         public void Dispose()
         {
             ClearParts();
-            _pool.Dispose();
+            _pool?.Dispose();
         }
         
         public void Setup()

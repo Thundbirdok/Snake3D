@@ -1,5 +1,7 @@
 namespace Game.Field
 {
+    using System.Linq;
+    using Game.Snake;
     using UnityEngine;
     using Random = UnityEngine.Random;
 
@@ -16,6 +18,9 @@ namespace Game.Field
         [SerializeField]
         private GameObject applePrefab;
 
+        [SerializeField]
+        private Snake snake;
+        
         private bool _isInitalized;
 
         public void Setup()
@@ -33,11 +38,28 @@ namespace Game.Field
 
         public void SetAppleNewPosition()
         {
-            var x = Random.Range(1, Size.x - 1) + 0.5f;
-            var y = Random.Range(1, Size.y - 1) + 0.5f;
-            var z = Random.Range(1, Size.z - 1) + 0.5f;
-            
-            Apple.localPosition = new Vector3(x, y, z);
+            while (true)
+            {
+                var x = Random.Range(1, Size.x - 1) + 0.5f;
+                var y = Random.Range(1, Size.y - 1) + 0.5f;
+                var z = Random.Range(1, Size.z - 1) + 0.5f;
+
+                var appleLocalPosition = new Vector3(x, y, z);
+
+                if (IsInsideSnake(appleLocalPosition))
+                {
+                    continue;
+                }
+
+                Apple.localPosition = appleLocalPosition;
+
+                break;
+            }
+        }
+
+        private bool IsInsideSnake(Vector3 appleLocalPosition)
+        {
+            return snake.PartsTargetPosition?.Any(part => part == appleLocalPosition) ?? false;
         }
 
         private void InstantiateApple()

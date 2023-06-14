@@ -21,10 +21,10 @@ namespace Game.States
         public override void Enable()
         {
             base.Enable();
-            
-            field.Setup();
+
             snake.Setup();
-            
+            field.Setup();
+
             stateMachine.SetState(playingState);
         }
     }
