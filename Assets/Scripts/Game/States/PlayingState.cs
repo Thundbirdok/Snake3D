@@ -61,8 +61,8 @@ namespace Game.States
                 return;
             }
 
+            field.EatApple();
             snake.Grow();
-            field.SetAppleNewPosition();
         }
 
         private bool IsWallsHit()

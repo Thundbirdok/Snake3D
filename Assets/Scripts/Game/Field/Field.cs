@@ -1,6 +1,7 @@
 namespace Game.Field
 {
     using System.Linq;
+    using Effects;
     using Game.Snake;
     using UnityEngine;
     using Random = UnityEngine.Random;
@@ -19,6 +20,9 @@ namespace Game.Field
         private GameObject applePrefab;
 
         [SerializeField]
+        private ParticleSystemSpawner particleSystemSpawner;
+        
+        [SerializeField]
         private Snake snake;
         
         private bool _isInitalized;
@@ -36,7 +40,14 @@ namespace Game.Field
             SetAppleNewPosition();
         }
 
-        public void SetAppleNewPosition()
+        public void EatApple()
+        {
+            particleSystemSpawner.PlaySystem(Apple.position);
+
+            SetAppleNewPosition();
+        }
+        
+        private void SetAppleNewPosition()
         {
             while (true)
             {
