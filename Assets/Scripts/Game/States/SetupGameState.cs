@@ -1,7 +1,7 @@
 namespace Game.States
 {
-    using Game.Field;
-    using Game.Snake;
+    using Field;
+    using Snake;
     using UnityEngine;
 
     public class SetupGameState : State

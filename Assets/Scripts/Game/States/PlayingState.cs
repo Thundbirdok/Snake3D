@@ -46,53 +46,58 @@ namespace Game.States
         
         private void CheckAppleHit()
         {
-            if (Mathf.Abs(field.Apple.localPosition.x - snake.HeadTargetPosition.x) > 0.1f)
+            var appleLocalPosition = field.AppleSpawner.Apple.localPosition;
+            var snakeHeadTargetPosition = snake.HeadTargetPosition;
+            
+            if (Mathf.Abs(appleLocalPosition.x - snakeHeadTargetPosition.x) > 0.1f)
             {
                 return;
             }
             
-            if (Mathf.Abs(field.Apple.localPosition.y - snake.HeadTargetPosition.y) > 0.1f)
+            if (Mathf.Abs(appleLocalPosition.y - snakeHeadTargetPosition.y) > 0.1f)
             {
                 return;
             }
             
-            if (Mathf.Abs(field.Apple.localPosition.z - snake.HeadTargetPosition.z) > 0.1f)
+            if (Mathf.Abs(appleLocalPosition.z - snakeHeadTargetPosition.z) > 0.1f)
             {
                 return;
             }
 
-            field.EatApple();
+            field.AppleSpawner.EatApple();
             snake.Grow();
         }
 
         private bool IsWallsHit()
         {
-            if (snake.HeadTargetPosition.x < 0.5f)
+            var snakeHeadTargetPosition = snake.HeadTargetPosition;
+            
+            if (snakeHeadTargetPosition.x < 0.5f)
             {
                 return true;
             }
 
-            if (snake.HeadTargetPosition.x > field.Size.x - 0.5f)
+            if (snakeHeadTargetPosition.x > field.Size.x - 0.5f)
             {
                 return true;
             }
             
-            if (snake.HeadTargetPosition.y < 0.5f)
+            if (snakeHeadTargetPosition.y < 0.5f)
             {
                 return true;
             }
             
-            if (snake.HeadTargetPosition.y > field.Size.y - 0.5f)
+            if (snakeHeadTargetPosition.y > field.Size.y - 0.5f)
             {
                 return true;
             }
 
-            if (snake.HeadTargetPosition.z < 0.5f)
+            if (snakeHeadTargetPosition.z < 0.5f)
             {
                 return true;
             }
 
-            if (snake.HeadTargetPosition.z > field.Size.z - 0.5f)
+            if (snakeHeadTargetPosition.z > field.Size.z - 0.5f)
             {
                 return true;
             }
