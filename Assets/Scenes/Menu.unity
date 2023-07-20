@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.11464222, g: 0.3301195, b: 0.7125536, a: 1}
+  m_IndirectSpecularColor: {r: 0.114481024, g: 0.32995456, b: 0.7119407, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -588,7 +588,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60.000004
+  field of view: 103
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -1298,7 +1298,7 @@ MonoBehaviour:
   m_LookAt: {fileID: 501152315}
   m_Follow: {fileID: 501152315}
   m_Lens:
-    FieldOfView: 60.000004
+    FieldOfView: 103
     OrthographicSize: 5
     NearClipPlane: 0.3
     FarClipPlane: 1000
@@ -1808,6 +1808,7 @@ GameObject:
   - component: {fileID: 1057012303}
   - component: {fileID: 1057012302}
   - component: {fileID: 1057012301}
+  - component: {fileID: 1057012305}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1899,6 +1900,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1057012305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1057012300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de97ef5ec36e6724484686d401e3d720, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canvasScaler: {fileID: 1057012302}
+  landscapeResolution: {x: 1920, y: 1080}
 --- !u!1001 &1246962046
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2181,7 +2196,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 87.49999, y: -87.49999}
+  m_AnchoredPosition: {x: 45, y: -45}
   m_SizeDelta: {x: 175, y: 175}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1352422565
@@ -2540,7 +2555,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 300, y: 300}
+  m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1637638984
 MonoBehaviour:
