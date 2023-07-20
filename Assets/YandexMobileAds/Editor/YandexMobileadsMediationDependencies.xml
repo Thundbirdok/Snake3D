@@ -1,0 +1,29 @@
+<dependencies>
+    <androidPackages>
+        <repositories>
+            <repository>https://maven.google.com/</repository>
+            <repository>https://android-sdk.is.com/</repository>
+            <repository>https://artifact.bytedance.com/repository/pangle</repository>
+            <repository>https://sdk.tapjoy.com/</repository>
+            <repository>https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea</repository>
+            <repository>https://cboost.jfrog.io/artifactory/chartboost-ads/</repository>
+            <repository>https://repo1.maven.org/maven2/</repository>
+        </repositories>
+        <androidPackage spec="com.yandex.android:mobileads-mediation:5.9.0.0" />
+    </androidPackages>
+
+    <iosPods>
+        <sources>
+            <source>https://github.com/CocoaPods/Specs</source>
+        </sources>
+        <iosPod name="YandexMobileAds" version="5.8.0" />
+        <iosPod name="AdMobYandexMobileAdsAdapters" />
+        <iosPod name="AppLovinYandexMobileAdsAdapters" />
+        <iosPod name="IronSourceYandexMobileAdsAdapters" />
+        <iosPod name="MyTargetYandexMobileAdsAdapters" />
+        <iosPod name="UnityAdsYandexMobileAdsAdapters" />
+        <iosPod name="MintegralYandexMobileAdsAdapters" />
+        <iosPod name="ChartboostYandexMobileAdsAdapters" />
+        <iosPod name="AdColonyYandexMobileAdsAdapters" />
+    </iosPods>
+</dependencies>
