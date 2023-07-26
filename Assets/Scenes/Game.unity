@@ -414,7 +414,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.22975291, y: 0.000000016746096, z: -0.0000000039532173, w: 0.973249}
+  m_LocalRotation: {x: 0.22975291, y: -0.000000016746089, z: 0.0000000039532155, w: 0.973249}
   m_LocalPosition: {x: 0, y: 1, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -832,7 +832,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 686062128}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.22975291, y: 0.000000016746096, z: -0.0000000039532173, w: 0.973249}
+  m_LocalRotation: {x: 0.22975291, y: -0.000000016746089, z: 0.0000000039532155, w: 0.973249}
   m_LocalPosition: {x: 0, y: 1, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -852,8 +852,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 474966205b65dc943be8be8de8d49ea8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  handler: {fileID: 1057012306}
   virtualCamera: {fileID: 686062129}
-  horizontalFovOnAspect: 1.777
   verticalFovOnLandscapeOrientation: 70.49793
 --- !u!1 &689851897
 GameObject:
@@ -1285,6 +1285,7 @@ GameObject:
   - component: {fileID: 1057012302}
   - component: {fileID: 1057012301}
   - component: {fileID: 1057012305}
+  - component: {fileID: 1057012306}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1387,10 +1388,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de97ef5ec36e6724484686d401e3d720, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  handler: {fileID: 1057012306}
   canvasScaler: {fileID: 1057012302}
   landscapeResolution: {x: 1920, y: 1080}
-  virtualCamera: {fileID: 686062129}
-  horizontalFovOnAspect: 1.777
+--- !u!114 &1057012306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1057012300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34714d0fa02293242ab981386552389e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainCamera: {fileID: 330585545}
+  <HorizontalToVerticalFovThreshold>k__BackingField: 0.5627
 --- !u!1 &1236446031
 GameObject:
   m_ObjectHideFlags: 0
