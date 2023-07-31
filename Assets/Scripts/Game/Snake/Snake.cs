@@ -2,6 +2,8 @@ namespace Game.Snake
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using Game.Snake.Mover;
     using UnityEngine;
 
     public class Snake : MonoBehaviour
@@ -18,15 +20,18 @@ namespace Game.Snake
         public float MoveDelay => snakeMover.Delay;
         
         public IReadOnlyList<Transform> Parts => grower.Parts;
-        public List<Vector3> PartsTargetPosition => snakeMover.PartsTargetPosition;
+        public List<SnakePartPose> PartsTarget => snakeMover.PartsTargetPose;
         
-        public Transform Head => grower.Parts[0].transform;
-        public Vector3 HeadTargetPosition => PartsTargetPosition[0];
+        public Transform Head => grower.Parts.First().transform;
+        public SnakePartPose HeadTarget => PartsTarget.First();
 
+        public Transform Tail => grower.Parts.Last().transform;
+        public SnakePartPose TailTarget => PartsTarget.Last();
+        
         public Vector3 TailPreviousTargetPosition => snakeMover.TailPreviousTargetPosition;
         
         [SerializeField]
-        private SnakeMover snakeMover;
+        private Mover.SnakeMover snakeMover;
         
         [SerializeField]
         private CameraMover cameraMover;

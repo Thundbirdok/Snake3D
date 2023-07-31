@@ -2,7 +2,6 @@ namespace Game.Snake
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using Game.Field;
     using UnityEngine;
     using UnityEngine.Pool;
@@ -62,13 +61,13 @@ namespace Game.Snake
 
         public void Grow()
         {
-            var tailPreviousPosition = _snake.TailPreviousTargetPosition;
+            var tailPreviousTargetPosition = _snake.TailPreviousTargetPosition;
 
-            var tailPosition = _snake.PartsTargetPosition.Last();
+            var tailTargetPosition = _snake.TailTarget.Position;
 
-            var rotation = Quaternion.LookRotation(tailPosition - tailPreviousPosition);
+            var rotation = Quaternion.LookRotation(tailTargetPosition - tailPreviousTargetPosition);
             
-            Grow(tailPreviousPosition, rotation);
+            Grow(tailPreviousTargetPosition, rotation);
         }
 
         private GameObject ActionOnCreate()
