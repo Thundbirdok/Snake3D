@@ -6,14 +6,14 @@ namespace Game.Snake
 
     public class Snake : MonoBehaviour
     {
-        public event Action OnAddPart;
-        public event Action OnSettedNewPosition;
+        public event Action OnPartAdded;
+        public event Action OnNewPositionSet;
 
         public bool IsActive { get; set; }
         
-        public Vector3 Forward => directionController.Forward;
-        public Vector3 Up => directionController.Up;
-        public Vector3 Right => directionController.Right;
+        public Vector3 Forward => DirectionController.Forward;
+        public Vector3 Up => DirectionController.Up;
+        public Vector3 Right => DirectionController.Right;
 
         public float MoveDelay => snakeMover.Delay;
         
@@ -34,14 +34,14 @@ namespace Game.Snake
         [SerializeField]
         private SnakeGrower grower;
         
-        [SerializeField]
-        private SnakeDirectionController directionController;
+        [field: SerializeField]
+        public SnakeDirectionController DirectionController { get; private set; }
 
         private bool _isInitialized;
 
         private void OnDestroy()
         {
-            directionController.Dispose();
+            DirectionController.Dispose();
             snakeMover.Dispose();
             grower.Dispose();
         }
@@ -52,13 +52,16 @@ namespace Game.Snake
             {
                 return;
             }
-            
-            if (snakeMover.IsTimeToSetNewTargetPositions())
+
+            var fixedDeltaTime = Time.fixedDeltaTime;
+
+            if (snakeMover.IsTimeToSetNewTargetPositions(fixedDeltaTime))
             {
-                directionController.UpdateDirection();
+                DirectionController.UpdateDirection();
+                DirectionController.TakeDirection();
                 snakeMover.SetTargetPositions();
                 
-                OnSettedNewPosition?.Invoke();
+                OnNewPositionSet?.Invoke();
             }
 
             snakeMover.MoveParts();
@@ -69,26 +72,29 @@ namespace Game.Snake
         {
             if (_isInitialized == false)
             {
-                grower.Construct(this);
-                directionController.Construct();
-                snakeMover.Construct(this);
-                cameraMover.Construct(this);
-                
-                _isInitialized = true;
+                Initialize();
             }
             
             grower.Setup();
-            directionController.Setup();
+            DirectionController.Setup();
             snakeMover.Setup();
             cameraMover.Setup();
-            
-            directionController.UpdateDirection();
         }
-        
+
         public void Grow()
         {
             grower.Grow();
-            OnAddPart?.Invoke();
+            OnPartAdded?.Invoke();
+        }
+
+        private void Initialize()
+        {
+            grower.Construct(this);
+            DirectionController.Construct();
+            snakeMover.Construct(this);
+            cameraMover.Construct(this);
+
+            _isInitialized = true;
         }
     }
 }

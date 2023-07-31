@@ -22,7 +22,7 @@ namespace Game.States
         {
             base.Enable();
             
-            snake.OnSettedNewPosition += Check;
+            snake.OnNewPositionSet += Check;
             snake.IsActive = true;
         }
 
@@ -31,7 +31,7 @@ namespace Game.States
             base.Disable();
             
             snake.IsActive = false;
-            snake.OnSettedNewPosition -= Check;
+            snake.OnNewPositionSet -= Check;
         }
 
         private void Check()

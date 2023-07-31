@@ -6,6 +6,8 @@ namespace Game.Snake
     [Serializable]
     public class SnakeDirectionController
     {
+        public bool IsUpdated { get; private set; }
+
         [SerializeField]
         private SnakeInputHandler snakeInputHandler;
 
@@ -41,7 +43,9 @@ namespace Game.Snake
             _tmpUp = Vector3.up;
             _tmpRight = Vector3.right;
         }
-        
+
+        public void TakeDirection() => IsUpdated = false;
+
         public void UpdateDirection()
         {
             Forward = _tmpForward;
@@ -80,6 +84,8 @@ namespace Game.Snake
             _tmpForward = newZAxis;
             _tmpUp = newYAxis;
             _tmpRight = newXAxis;
+            
+            IsUpdated = true;
         }
     }
 }

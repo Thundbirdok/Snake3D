@@ -25,6 +25,8 @@ namespace Game.Snake
 
         private Snake _snake;
 
+        private bool _isPartsMoved;
+        
         public void Construct(Snake snake)
         {
             _snake = snake;
@@ -32,77 +34,98 @@ namespace Game.Snake
             PartsTargetPosition = new List<Vector3>(_snake.Parts.Count);
             _partsTargetRotation = new List<Quaternion>(_snake.Parts.Count);
 
-            _snake.OnAddPart += OnAddPart;
+            _snake.OnPartAdded += PartAdded;
         }
 
         public void Dispose()
         {
             if (_snake != null)
             {
-                _snake.OnAddPart -= OnAddPart;
+                _snake.OnPartAdded -= PartAdded;
             }
         }
 
         public void Setup()
         {
             timer.ResetTime();
-            
-            if (PartsTargetPosition == null)
-            {
-                return;
-            }
 
-            if (_partsTargetRotation == null)
-            {
-                return;
-            }
-            
-            PartsTargetPosition.Clear();
-            _partsTargetRotation.Clear();
-            
-            foreach (var part in _snake.Parts)
-            {
-                SetPartToTargets(part);
-            }
-        }
-        
-        private void OnAddPart()
-        {
-            var part = _snake.Parts.Last();
-
-            SetPartToTargets(part);
+            SetPartsToTargets();
         }
 
-        public bool IsTimeToSetNewTargetPositions() => timer.AddTime(Time.fixedDeltaTime);
+        public bool IsTimeToSetNewTargetPositions(float time) => 
+            timer.AddTime(time) 
+            || _isPartsMoved 
+            && _snake.DirectionController.IsUpdated;
 
         public void MoveParts()
         {
+            if (_isPartsMoved)
+            {
+                return;
+            }
+            
+            var t = Time.fixedDeltaTime / moveTime;
+
+            _isPartsMoved = true;
+            
             for (var i = 0; i < PartsTargetPosition.Count; i++)
             {
-                var t = Time.fixedDeltaTime / moveTime;
-
-                var part = _snake.Parts[i].transform;       
-
-                var newPosition = Vector3.MoveTowards
+                var isAtTargetPosition = MovePartToTarget
                 (
-                    part.localPosition,
-                    PartsTargetPosition[i],
-                    t
+                    t, 
+                    _snake.Parts[i].transform,
+                    PartsTargetPosition[i], 
+                    _partsTargetRotation[i]
                 );
-            
-                var newRotation = Quaternion.RotateTowards
-                (
-                    part.localRotation,
-                    _partsTargetRotation[i],
-                    t * 90
-                );
-            
-                part.SetLocalPositionAndRotation(newPosition, newRotation);
+
+                if (isAtTargetPosition == false)
+                {
+                    _isPartsMoved = false;
+                }
             }
+        }
+
+        private bool MovePartToTarget
+        (
+            float t,
+            Transform part,
+            Vector3 targetPosition,
+            Quaternion targetRotation
+        )
+        {
+            var localPosition = part.localPosition;
+            var localRotation = part.localRotation;
+
+            var newPosition = Vector3.MoveTowards
+            (
+                localPosition,
+                targetPosition,
+                t
+            );
+
+            var newRotation = Quaternion.RotateTowards
+            (
+                localRotation,
+                targetRotation,
+                t * 90
+            );
+
+            part.SetLocalPositionAndRotation(newPosition, newRotation);
+
+            return localPosition == targetPosition 
+                   && localRotation == targetRotation;
         }
 
         public void SetTargetPositions()
         {
+            if (_isPartsMoved == false)
+            {
+                return;
+            }
+
+            _isPartsMoved = false;
+            timer.ResetTime();
+            
             var head = PartsTargetPosition[0];
 
             var forward = _snake.Forward;
@@ -126,6 +149,34 @@ namespace Game.Snake
                 newPosition = position;
                 newRotation = rotation;
             }
+        }
+
+        private void SetPartsToTargets()
+        {
+            if (PartsTargetPosition == null)
+            {
+                return;
+            }
+
+            if (_partsTargetRotation == null)
+            {
+                return;
+            }
+
+            PartsTargetPosition.Clear();
+            _partsTargetRotation.Clear();
+
+            foreach (var part in _snake.Parts)
+            {
+                SetPartToTargets(part);
+            }
+        }
+
+        private void PartAdded()
+        {
+            var part = _snake.Parts.Last();
+
+            SetPartToTargets(part);
         }
 
         private void SetPartToTargets(Transform part)
