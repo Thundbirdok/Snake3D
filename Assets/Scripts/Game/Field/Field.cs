@@ -1,5 +1,7 @@
 namespace Game.Field
 {
+    using Game.Field.Wall;
+    using Game.Snake;
     using UnityEngine;
 
     public class Field : MonoBehaviour
@@ -7,6 +9,9 @@ namespace Game.Field
         [field: SerializeField]
         public Vector3Int Size { get; private set; }
 
+        [field: SerializeField]
+        public Snake Snake { get; private set; }
+        
         [field: SerializeField]
         public WallSpawner WallSpawner { get; private set; }
 
@@ -24,7 +29,8 @@ namespace Game.Field
                 
                 _isInitialized = true;
             }
-            
+
+            WallSpawner.Setup();
             AppleSpawner.SetToStart();
         }
     }

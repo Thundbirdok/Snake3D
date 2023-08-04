@@ -5,8 +5,7 @@ namespace Game.Field
     using System;
     using Effects;
     using UnityEngine;
-    using Snake;
-    
+
     [Serializable]
     public class AppleSpawner
     {
@@ -18,16 +17,13 @@ namespace Game.Field
         [SerializeField]
         private ParticleSystemSpawner particleSystemSpawner;
 
-        [SerializeField]
-        private Snake snake;
-        
         [SerializeField] 
         private Transform container;
 
         private Field _field;
 
         private bool _isInitialized;
-        
+
         public void Initialize(Field field)
         {
             if (_isInitialized)
@@ -86,7 +82,7 @@ namespace Game.Field
 
         private bool IsInsideSnake(Vector3 appleLocalPosition)
         {
-            return snake.PartsTarget?.Any(part => part.Position == appleLocalPosition) ?? false;
+            return _field.Snake.PartsTarget?.Any(part => part.Position == appleLocalPosition) ?? false;
         }
     }
 }

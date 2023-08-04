@@ -1,19 +1,22 @@
-namespace Game.Field
+namespace Game.Field.Wall
 {
     using System;
+    using System.Collections.Generic;
     using UnityEngine;
-    
+
     [Serializable]
     public class WallSpawner
     {
         [SerializeField]
-        private GameObject wallPrefab;
+        private Wall wallPrefab;
 
         [SerializeField] 
         private Transform container;
         
         private Field _field;
-        
+
+        private List<Wall> _walls = new List<Wall>();
+
         public void Initialize(Field field)
         {
             _field = field;
@@ -21,6 +24,14 @@ namespace Game.Field
             InstantiateWalls();
         }
 
+        public void Setup()
+        {
+            foreach (var wall in _walls)
+            {
+                wall.Setup(_field.Snake.Head);
+            }
+        }
+        
         private void InstantiateWalls()
         {
             var size = _field.Size;
@@ -64,10 +75,16 @@ namespace Game.Field
         private void InstantiateWall(Vector3 position, Quaternion rotation, float scale)
         {
             var wall = UnityEngine.Object.Instantiate(wallPrefab, container);
+
+            var wallTransform = wall.transform;
             
-            wall.transform.localPosition = position;
-            wall.transform.localRotation = rotation;
-            wall.transform.localScale = scale * Vector3.one;
+            wallTransform.localPosition = position;
+            wallTransform.localRotation = rotation;
+            wallTransform.localScale = scale * Vector3.one;
+
+            _walls.Add(wall);
+            
+            wall.Initialize();
         }
     }
 }
