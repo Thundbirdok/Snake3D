@@ -35,5 +35,9 @@ namespace Utility
             
             return true;
         }
+
+        public void SetTime(float time) => _time = time;
+
+        public void SetTimeToMax() => SetTime(Duration);
     }
 }

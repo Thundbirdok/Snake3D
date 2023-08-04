@@ -14,7 +14,7 @@ namespace Game.Snake
         private CinemachineVirtualCamera virtualCamera;
 
         private Snake _snake;
-        
+
         public void Construct(Snake snake)
         {
             _snake = snake;
@@ -38,11 +38,13 @@ namespace Game.Snake
             }
 
             var cameraTargetPosition = _snake.Head.localPosition;
+            var localTargetRotation = _snake.Head.localRotation;
+            
             var delta = cameraTarget.localPosition - cameraTargetPosition;
 
             cameraTarget.localPosition = cameraTargetPosition;
-            cameraTarget.localRotation = _snake.Head.localRotation;
-            
+            cameraTarget.localRotation = localTargetRotation;
+
             virtualCamera.PreviousStateIsValid = false;
             
             virtualCamera.OnTargetObjectWarped(cameraTarget, delta);

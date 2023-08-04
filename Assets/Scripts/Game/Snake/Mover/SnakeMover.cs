@@ -45,7 +45,7 @@ namespace Game.Snake.Mover
 
         public void Setup()
         {
-            timer.ResetTime();
+            timer.SetTimeToMax();
 
             _partsTargetPoseHandler.SetPartsToTargets();
         }
@@ -66,7 +66,7 @@ namespace Game.Snake.Mover
                 return;
             }
             
-            var t = Time.fixedDeltaTime / moveTime;
+            var delta = Time.fixedDeltaTime / moveTime;
 
             _isPartsMoved = true;
             
@@ -74,7 +74,7 @@ namespace Game.Snake.Mover
             {
                 var isAtTargetPosition = MovePartToTarget
                 (
-                    t, 
+                    delta, 
                     _snake.Parts[i].transform,
                     PartsTargetPose[i]
                 );
@@ -88,7 +88,7 @@ namespace Game.Snake.Mover
 
         private bool MovePartToTarget
         (
-            float t,
+            float delta,
             Transform part,
             SnakePartPose targetSnakePartPose
         )
@@ -103,14 +103,14 @@ namespace Game.Snake.Mover
             (
                 localPosition,
                 targetPosition,
-                t
+                delta
             );
 
             var newRotation = Quaternion.RotateTowards
             (
                 localRotation,
                 targetRotation,
-                t * 90
+                delta * 90
             );
 
             part.SetLocalPositionAndRotation(newPosition, newRotation);

@@ -31,7 +31,7 @@ namespace Game.Snake
         public Vector3 TailPreviousTargetPosition => snakeMover.TailPreviousTargetPosition;
         
         [SerializeField]
-        private Mover.SnakeMover snakeMover;
+        private SnakeMover snakeMover;
         
         [SerializeField]
         private CameraMover cameraMover;
