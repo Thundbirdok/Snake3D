@@ -31,14 +31,9 @@ namespace Game.Snake
             {
                 return;
             }
-            
-            if (_snake.Head == null)
-            {
-                return;
-            }
 
-            var cameraTargetPosition = _snake.Head.localPosition;
-            var localTargetRotation = _snake.Head.localRotation;
+            var cameraTargetPosition = _snake.Head.Position;
+            var localTargetRotation = _snake.Head.Rotation;
             
             var delta = cameraTarget.localPosition - cameraTargetPosition;
 
@@ -55,14 +50,14 @@ namespace Game.Snake
             cameraTarget.localPosition = Vector3.MoveTowards
             (
                 cameraTarget.localPosition,
-                _snake.Head.localPosition + _snake.Forward,
+                _snake.Head.Position + _snake.Forward,
                 Time.fixedDeltaTime / _snake.MoveDelay
             );
 
             cameraTarget.localRotation = Quaternion.RotateTowards
             (
                 cameraTarget.localRotation, 
-                _snake.Head.localRotation,
+                _snake.Head.Rotation,
                 Time.fixedDeltaTime / _snake.MoveDelay * 180
             );
         }

@@ -19,13 +19,13 @@ namespace Game.Snake
 
         public float MoveDelay => snakeMover.Delay;
         
-        public IReadOnlyList<Transform> Parts => grower.Parts;
+        public IReadOnlyList<SnakePartPose> Parts => grower.Parts;
         public List<SnakePartPose> PartsTarget => snakeMover.PartsTargetPose;
         
-        public Transform Head => grower.Parts.First().transform;
+        public SnakePartPose Head => grower.Parts.First();
         public SnakePartPose HeadTarget => PartsTarget.First();
 
-        public Transform Tail => grower.Parts.Last().transform;
+        public SnakePartPose Tail => grower.Parts.Last();
         public SnakePartPose TailTarget => PartsTarget.Last();
         
         public Vector3 TailPreviousTargetPosition => snakeMover.TailPreviousTargetPosition;
@@ -39,6 +39,9 @@ namespace Game.Snake
         [SerializeField]
         private SnakeGrower grower;
         
+        [SerializeField]
+        private SnakeDrawer drawer;
+        
         [field: SerializeField]
         public SnakeDirectionController DirectionController { get; private set; }
 
@@ -49,6 +52,11 @@ namespace Game.Snake
             DirectionController.Dispose();
             snakeMover.Dispose();
             grower.Dispose();
+        }
+
+        private void Update()
+        {
+            drawer.Draw();
         }
 
         private void FixedUpdate()
@@ -95,6 +103,7 @@ namespace Game.Snake
         private void Initialize()
         {
             grower.Construct(this);
+            drawer.Construct(grower);
             DirectionController.Construct();
             snakeMover.Construct(this);
             cameraMover.Construct(this);

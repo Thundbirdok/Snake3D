@@ -1,6 +1,7 @@
 namespace Effects
 {
     using System;
+    using Game.Snake.Mover;
     using UnityEngine;
     
     [Serializable]
@@ -11,7 +12,7 @@ namespace Effects
         
         private static readonly int TargetProperty = Shader.PropertyToID("_Target");
         
-        private Transform _target;
+        private SnakePartPose _target;
 
         private MaterialPropertyBlock _block;
 
@@ -28,7 +29,7 @@ namespace Effects
             meshRenderer.GetPropertyBlock(_block);
         }
 
-        public void Setup(Transform target)
+        public void Setup(SnakePartPose target)
         {
             _target = target;
         }
@@ -45,12 +46,12 @@ namespace Effects
                 return;
             }
 
-            if (_position == _target.position)
+            if (_position == _target.Position)
             { 
                 return;
             }
             
-            _position = _target.position;
+            _position = _target.Position;
             
             _block.SetVector(TargetProperty, _position);
             meshRenderer.SetPropertyBlock(_block);

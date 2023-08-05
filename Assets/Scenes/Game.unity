@@ -2316,10 +2316,10 @@ MonoBehaviour:
     virtualCamera: {fileID: 686062129}
   grower:
     field: {fileID: 230307914}
-    container: {fileID: 1822188184}
+    startPartsNumber: 3
+  drawer:
     partPrefab: {fileID: 4164054200232900496, guid: c3d16dfb924db8c469533b030866b51f,
       type: 3}
-    startPartsNumber: 3
   <DirectionController>k__BackingField:
     snakeInputHandler: {fileID: 1247984558}
 --- !u!1 &1825489486

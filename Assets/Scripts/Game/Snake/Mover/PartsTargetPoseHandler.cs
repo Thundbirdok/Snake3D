@@ -75,10 +75,10 @@ namespace Game.Snake.Mover
             SetPartToTargets(part);
         }
     
-        private void SetPartToTargets(Transform part)
+        private void SetPartToTargets(SnakePartPose part)
         {
-            var localPosition = part.transform.localPosition;
-            var localRotation = part.localRotation;
+            var localPosition = part.Position;
+            var localRotation = part.Rotation;
 
             var newPose = new SnakePartPose(localPosition, localRotation);
             

@@ -75,7 +75,7 @@ namespace Game.Snake.Mover
                 var isAtTargetPosition = MovePartToTarget
                 (
                     delta, 
-                    _snake.Parts[i].transform,
+                    _snake.Parts[i],
                     PartsTargetPose[i]
                 );
 
@@ -89,12 +89,12 @@ namespace Game.Snake.Mover
         private bool MovePartToTarget
         (
             float delta,
-            Transform part,
+            SnakePartPose part,
             SnakePartPose targetSnakePartPose
         )
         {
-            var localPosition = part.localPosition;
-            var localRotation = part.localRotation;
+            var localPosition = part.Position;
+            var localRotation = part.Rotation;
 
             var targetPosition = targetSnakePartPose.Position;
             var targetRotation = targetSnakePartPose.Rotation;
@@ -113,8 +113,9 @@ namespace Game.Snake.Mover
                 delta * 90
             );
 
-            part.SetLocalPositionAndRotation(newPosition, newRotation);
-
+            part.Position = newPosition;
+            part.Rotation = newRotation;
+            
             return localPosition == targetPosition 
                    && localRotation == targetRotation;
         }
