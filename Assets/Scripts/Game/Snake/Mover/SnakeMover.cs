@@ -13,9 +13,6 @@ namespace Game.Snake.Mover
     [Serializable]
     public class SnakeMover
     {
-        public float3[] PartsTargetsPositions => _partsTargetPosesHandler.Positions.ToArray();
-        public quaternion[] PartsTargetsRotations => _partsTargetPosesHandler.Rotations.ToArray();
-        
         public float Delay => timer.Duration;
 
         [SerializeField]
@@ -25,7 +22,7 @@ namespace Game.Snake.Mover
         private float moveTime = 0.25f;
 
         private SnakePartsPosesHandler _partsPosesHandler;
-        private PartsTargetPosesHandler _partsTargetPosesHandler;
+        private SnakePartsTargetPosesHandler _partsTargetPosesHandler;
         private SnakeDirectionController _directionController;
         
         private bool _isPartsMoved;
@@ -36,7 +33,7 @@ namespace Game.Snake.Mover
         public void Construct
         (
             SnakePartsPosesHandler partsPosesHandler,
-            PartsTargetPosesHandler partsTargetPosesHandler,
+            SnakePartsTargetPosesHandler partsTargetPosesHandler,
             SnakeDirectionController directionController
         )
         {
@@ -58,6 +55,7 @@ namespace Game.Snake.Mover
         public void Setup()
         {
             timer.SetTimeToMax();
+            _isPartsMoved = true;
         }
 
         public bool IsTimeToSetNewTargetPositions(float time)
@@ -102,13 +100,13 @@ namespace Game.Snake.Mover
 
             _isPartsMoved = true;
             
-            for (var i = 0; i < PartsTargetsPositions.Length; i++)
+            for (var i = 0; i < _partsTargetPosesHandler.Positions.Length; i++)
             {
                 var position = _partsPosesHandler.PartsPositions[i];
                 var rotation = _partsPosesHandler.PartsRotations[i];
 
-                var targetPosition = PartsTargetsPositions[i];
-                var targetRotation = PartsTargetsRotations[i];
+                var targetPosition = _partsTargetPosesHandler.Positions[i];
+                var targetRotation = _partsTargetPosesHandler.Rotations[i];
 
                 if (position.Equals(targetPosition) == false)
                 {
@@ -131,7 +129,7 @@ namespace Game.Snake.Mover
             _isPartsMoved = false;
             timer.ResetTime();
             
-            _partsTargetPosesHandler.SetTargetPositions();
+            _partsTargetPosesHandler.SchedulePartsTargetPoses();
         }
 
         private void AddTargetForLastPart()

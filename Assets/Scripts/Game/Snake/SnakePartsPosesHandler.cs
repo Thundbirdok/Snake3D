@@ -28,9 +28,9 @@ namespace Game.Snake
         [SerializeField]
         private int startPartsNumber;
         
-        private PartsTargetPosesHandler _targetPosesHandler;
+        private SnakePartsTargetPosesHandler _targetPosesHandler;
 
-        public void Construct(PartsTargetPosesHandler targetPosesHandler)
+        public void Construct(SnakePartsTargetPosesHandler targetPosesHandler)
         {
             _targetPosesHandler = targetPosesHandler;
         }
@@ -73,6 +73,16 @@ namespace Game.Snake
 
             var partPosition = new float3(xPartPosition, yPartPosition, zPartPosition);
 
+            if (PartsPositions.IsCreated == false)
+            {
+                PartsPositions.Dispose();
+            }
+
+            if (PartsRotations.IsCreated == false)
+            {
+                PartsRotations.Dispose();
+            }
+
             PartsPositions = new NativeArray<float3>(startPartsNumber, Allocator.Persistent);
             PartsRotations = new NativeArray<quaternion>(startPartsNumber, Allocator.Persistent);
             
@@ -87,8 +97,15 @@ namespace Game.Snake
 
         private void ClearParts()
         {
-            PartsPositions.Dispose();
-            PartsRotations.Dispose();
+            if (PartsPositions.IsCreated == false)
+            {
+                PartsPositions.Dispose();
+            }
+
+            if (PartsRotations.IsCreated == false)
+            {
+                PartsRotations.Dispose();
+            }
         }
 
         private void Grow(Vector3 position, Quaternion rotation)
@@ -99,21 +116,31 @@ namespace Game.Snake
             PartsPositions = new NativeArray<float3>(oldPartPosition.Length + 1, Allocator.Persistent);
             PartsRotations = new NativeArray<quaternion>(oldPartRotation.Length + 1, Allocator.Persistent);
 
-            if (oldPartPosition.Length > 0)
+            if (oldPartPosition.IsCreated)
             {
-                NativeArray<float3>.Copy(oldPartPosition, PartsPositions, oldPartPosition.Length);
-                PartsPositions[oldPartPosition.Length] = position;
+                if (oldPartPosition.Length > 0)
+                {
+                    NativeArray<float3>.Copy
+                        (oldPartPosition, PartsPositions, oldPartPosition.Length);
+
+                    PartsPositions[oldPartPosition.Length] = position;
+                }
+                
+                oldPartPosition.Dispose();
             }
 
-            if (oldPartPosition.Length > 0)
+            if (oldPartPosition.IsCreated)
             {
-                NativeArray<quaternion>.Copy(oldPartRotation, PartsRotations, oldPartPosition.Length);
+                if (oldPartPosition.Length > 0)
+                {
+                    NativeArray<quaternion>.Copy
+                        (oldPartRotation, PartsRotations, oldPartPosition.Length);
 
-                PartsRotations[oldPartRotation.Length] = rotation;
+                    PartsRotations[oldPartRotation.Length] = rotation;
+                }
+
+                oldPartRotation.Dispose();
             }
-
-            oldPartPosition.Dispose();
-            oldPartRotation.Dispose();
         }
     }
 }

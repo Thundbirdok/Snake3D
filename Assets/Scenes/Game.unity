@@ -303,7 +303,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Size>k__BackingField: {x: 10, y: 10, z: 10}
   <Snake>k__BackingField: {fileID: 1822188185}
-  <WallSpawner>k__BackingField:
+  <WallsHandler>k__BackingField:
     wallPrefab: {fileID: 4245745267574250282, guid: 3b3e97994d10d7f4bafc84a62e6771f3,
       type: 3}
     container: {fileID: 230307915}

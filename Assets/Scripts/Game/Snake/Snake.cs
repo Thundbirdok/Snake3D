@@ -2,6 +2,7 @@ namespace Game.Snake
 {
     using System;
     using Game.Snake.Mover;
+    using Unity.Collections;
     using Unity.Mathematics;
     using UnityEngine;
 
@@ -11,7 +12,7 @@ namespace Game.Snake
 
         public bool IsActive { get; set; }
         
-        public float3[] PartsTargetPositions => snakeMover.PartsTargetsPositions;
+        public NativeArray<float3> PartsTargetPositions => _partsTargetPosesHandler.Positions;
         public float3 HeadTargetPosition => _partsTargetPosesHandler.HeadTargetPosition;
         public float3 HeadPosition => partsPosesHandler.HeadPosition;
         
@@ -31,8 +32,10 @@ namespace Game.Snake
         private SnakeDirectionController directionController;
 
         private bool _isInitialized;
+
+        private bool _isNeedGetTargetPositions;
         
-        private PartsTargetPosesHandler _partsTargetPosesHandler;
+        private SnakePartsTargetPosesHandler _partsTargetPosesHandler;
 
         private void OnDestroy()
         {
@@ -57,11 +60,14 @@ namespace Game.Snake
                 directionController.UpdateDirection();
                 directionController.TakeDirection();
                 snakeMover.SetTargetPositions();
-                
-                OnNewPositionSet?.Invoke();
-            }
 
-            snakeMover.ScheduleMoveParts();
+                _isNeedGetTargetPositions = true;
+            }
+            else
+            {
+                snakeMover.ScheduleMoveParts();
+            }
+            
             drawer.Draw();
         }
 
@@ -71,8 +77,20 @@ namespace Game.Snake
             {
                 return;
             }
+
+            if (_isNeedGetTargetPositions)
+            {
+                _partsTargetPosesHandler.GetPartsTargetPoses();
+
+                OnNewPositionSet?.Invoke();
+                
+                _isNeedGetTargetPositions = false;
+            }
+            else
+            {
+                snakeMover.MoveParts();
+            }
             
-            snakeMover.MoveParts();
             cameraMover.Move();
         }
         
@@ -96,7 +114,7 @@ namespace Game.Snake
         {
             IsActive = false;
             
-            _partsTargetPosesHandler = new PartsTargetPosesHandler(partsPosesHandler, directionController);
+            _partsTargetPosesHandler = new SnakePartsTargetPosesHandler(partsPosesHandler, directionController);
             
             partsPosesHandler.Construct(_partsTargetPosesHandler);
             directionController.Construct();
