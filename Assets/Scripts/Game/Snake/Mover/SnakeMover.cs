@@ -1,20 +1,20 @@
 namespace Game.Snake.Mover
 {
     using System;
-    using System.Collections.Generic;
+    using System.Runtime.CompilerServices;
     using Unity.Burst;
     using Unity.Collections;
     using Unity.Collections.LowLevel.Unsafe;
     using Unity.Jobs;
+    using Unity.Mathematics;
     using UnityEngine;
     using Utility;
 
     [Serializable]
     public class SnakeMover
     {
-        public List<SnakePartPose> PartsTargetPose => _partsTargetPoseHandler.PartsTargetPose;
-
-        public Vector3 TailPreviousTargetPosition => _partsTargetPoseHandler.TailPreviousTargetPosition;
+        public float3[] PartsTargetsPositions => _partsTargetPosesHandler.Positions.ToArray();
+        public quaternion[] PartsTargetsRotations => _partsTargetPosesHandler.Rotations.ToArray();
         
         public float Delay => timer.Duration;
 
@@ -24,54 +24,52 @@ namespace Game.Snake.Mover
         [SerializeField]
         private float moveTime = 0.25f;
 
-        private Snake _snake;
-
-        private PartsTargetPoseHandler _partsTargetPoseHandler;
+        private SnakePartsPosesHandler _partsPosesHandler;
+        private PartsTargetPosesHandler _partsTargetPosesHandler;
+        private SnakeDirectionController _directionController;
         
         private bool _isPartsMoved;
+
+        private JobHandle _positionJob;
+        private JobHandle _rotationJob;
         
-        private NativeArray<Vector3> _targetPositions;
-        private NativeArray<Quaternion> _targetRotations;
-        
-        private NativeArray<Vector3> _partsPositions;
-        private NativeArray<Quaternion> _partsRotations;
-        
-        public void Construct(Snake snake)
+        public void Construct
+        (
+            SnakePartsPosesHandler partsPosesHandler,
+            PartsTargetPosesHandler partsTargetPosesHandler,
+            SnakeDirectionController directionController
+        )
         {
-            _snake = snake;
-
-            _partsTargetPoseHandler = new PartsTargetPoseHandler(snake);
-
-            _snake.OnPartAdded += AddTargetForLastPart;
+            _partsPosesHandler = partsPosesHandler;
+            _partsTargetPosesHandler = partsTargetPosesHandler;
+            _directionController = directionController;
+            
+            _partsPosesHandler.OnPartAdded += AddTargetForLastPart;
         }
 
         public void Dispose()
         {
-            if (_snake != null)
+            if (_partsPosesHandler != null)
             {
-                _snake.OnPartAdded -= AddTargetForLastPart;
+                _partsPosesHandler.OnPartAdded -= AddTargetForLastPart;
             }
         }
 
         public void Setup()
         {
             timer.SetTimeToMax();
-
-            _partsTargetPoseHandler.SetPartsToTargets();
-            
-            SetNativeArrays();
         }
 
         public bool IsTimeToSetNewTargetPositions(float time)
         {
             var isTime = timer.AddTime(time);
 
-            var isForceTurnCauseInput = _isPartsMoved && _snake.DirectionController.IsUpdated;
+            var isForceTurnCauseInput = _isPartsMoved && _directionController.IsUpdated;
 
             return isTime || isForceTurnCauseInput;
         } 
         
-        public void MoveParts()
+        public void ScheduleMoveParts()
         {
             if (_isPartsMoved)
             {
@@ -81,51 +79,48 @@ namespace Game.Snake.Mover
             var delta = Time.fixedDeltaTime / moveTime;
 
             _isPartsMoved = true;
-
-            for (var i = 0; i < _snake.Parts.Count; i++)
-            {
-                var target = _partsTargetPoseHandler.PartsTargetPose[i];
-                
-                _targetPositions[i] = target.Position;
-                _targetRotations[i] = target.Rotation;
-            }
             
-            var positionJob = new MovePositionToTargetJob()
+            _positionJob = new MovePositionToTargetJob()
             {
-                PartsTargetPositions = _targetPositions,
-                PartsPositions = _partsPositions,
+                PartsTargetPositions = _partsTargetPosesHandler.Positions,
+                PartsPositions = _partsPosesHandler.PartsPositions,
                 Delta = delta
-            }.Schedule(_snake.Parts.Count, 64);
+            }.Schedule(_partsTargetPosesHandler.Positions.Length, 64);
 
-            var rotationJob = new MoveRotationToTargetJob()
+            _rotationJob = new MoveRotationToTargetJob()
             {
-                PartsTargetRotations = _targetRotations,
-                PartsRotations = _partsRotations,
+                PartsTargetRotations = _partsTargetPosesHandler.Rotations,
+                PartsRotations = _partsPosesHandler.PartsRotations,
                 Delta = delta
-            }.Schedule(_snake.Parts.Count, 64);
+            }.Schedule(_partsTargetPosesHandler.Rotations.Length, 64);
+        }
+
+        public void MoveParts()
+        {
+            _positionJob.Complete();
+            _rotationJob.Complete();
+
+            _isPartsMoved = true;
             
-            positionJob.Complete();
-            rotationJob.Complete();
-            
-            for (var i = 0; i < PartsTargetPose.Count; i++)
+            for (var i = 0; i < PartsTargetsPositions.Length; i++)
             {
-                _snake.Parts[i].Position = _partsPositions[i];
-                _snake.Parts[i].Rotation = _partsRotations[i];
-                
-                var position = _snake.Parts[i].Position;
-                var rotation = _snake.Parts[i].Rotation;
+                var position = _partsPosesHandler.PartsPositions[i];
+                var rotation = _partsPosesHandler.PartsRotations[i];
 
-                var targetPosition = PartsTargetPose[i].Position;
-                var targetRotation = PartsTargetPose[i].Rotation;
+                var targetPosition = PartsTargetsPositions[i];
+                var targetRotation = PartsTargetsRotations[i];
 
-                if (position != targetPosition
-                    || rotation != targetRotation)
+                if (position.Equals(targetPosition) == false)
+                {
+                    _isPartsMoved = false;
+                }
+                else if (rotation.Equals(targetRotation) == false)
                 {
                     _isPartsMoved = false;
                 }
             }
         }
-
+        
         public void SetTargetPositions()
         {
             if (_isPartsMoved == false)
@@ -136,31 +131,12 @@ namespace Game.Snake.Mover
             _isPartsMoved = false;
             timer.ResetTime();
             
-            _partsTargetPoseHandler.SetTargetPositions();
-        }
-
-        private void SetNativeArrays()
-        {
-            _targetPositions = new NativeArray<Vector3>(_snake.Parts.Count, Allocator.Persistent);
-            _targetRotations = new NativeArray<Quaternion>(_snake.Parts.Count, Allocator.Persistent);
-
-            _partsPositions = new NativeArray<Vector3>(_snake.Parts.Count, Allocator.Persistent);
-            _partsRotations = new NativeArray<Quaternion>(_snake.Parts.Count, Allocator.Persistent);
-            
-            for (var i = 0; i < _snake.Parts.Count; i++)
-            {
-                var part = _snake.Parts[i];
-
-                _partsPositions[i] = part.Position;
-                _partsRotations[i] = part.Rotation;
-            }
+            _partsTargetPosesHandler.SetTargetPositions();
         }
 
         private void AddTargetForLastPart()
         {
-            _partsTargetPoseHandler.AddTargetForLastPart();
-            
-            SetNativeArrays();
+            _partsTargetPosesHandler.AddTargetForLastPart();
         }
     }
     
@@ -168,10 +144,10 @@ namespace Game.Snake.Mover
     public struct MoveRotationToTargetJob : IJobParallelFor
     {
         [ReadOnly]
-        public NativeArray<Quaternion> PartsTargetRotations;
+        public NativeArray<quaternion> PartsTargetRotations;
 
         [NativeDisableContainerSafetyRestriction]
-        public NativeArray<Quaternion> PartsRotations;
+        public NativeArray<quaternion> PartsRotations;
 
         [ReadOnly]
         public float Delta;
@@ -182,7 +158,7 @@ namespace Game.Snake.Mover
             var targetRotation = PartsTargetRotations[index];
             var partRotation = PartsRotations[index];
                 
-            var newRotation = Quaternion.RotateTowards
+            var newRotation = RotateTowards
             (
                 partRotation,
                 targetRotation,
@@ -191,16 +167,40 @@ namespace Game.Snake.Mover
 
             PartsRotations[index] = newRotation;
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public quaternion RotateTowards(quaternion from, quaternion to, float maxDegreesDelta)
+        {
+            var num = Angle(from, to);
+            return (double) num == 0.0 ? to : Quaternion.SlerpUnclamped(from, to, Mathf.Min(1f, maxDegreesDelta / num));
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Angle(quaternion a, quaternion b)
+        {
+            var num = Mathf.Min(Mathf.Abs(Dot(a, b)), 1f);
+            return IsEqualUsingDot(num) ? 0.0f : (float) ((double) Mathf.Acos(num) * 2.0 * 57.295780181884766);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool IsEqualUsingDot(float dot) => (double) dot > 0.9999989867210388;
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Dot(quaternion a, quaternion b) => 
+            (float) ((double) a.value.x * b.value.x 
+                     + (double) a.value.y * b.value.y 
+                     + (double) a.value.z * b.value.z 
+                     + (double) a.value.w * b.value.w);
     }
         
     [BurstCompile]
     public struct MovePositionToTargetJob : IJobParallelFor
     {
         [ReadOnly]
-        public NativeArray<Vector3> PartsTargetPositions;
+        public NativeArray<float3> PartsTargetPositions;
 
         [NativeDisableContainerSafetyRestriction]
-        public NativeArray<Vector3> PartsPositions;
+        public NativeArray<float3> PartsPositions;
 
         [ReadOnly]
         public float Delta;
@@ -210,8 +210,8 @@ namespace Game.Snake.Mover
         {
             var targetPosition = PartsTargetPositions[index];
             var partPosition = PartsPositions[index];
-
-            var newPosition = Vector3.MoveTowards
+            
+            var newPosition = MoveTowards
             (
                 partPosition,
                 targetPosition,
@@ -219,6 +219,39 @@ namespace Game.Snake.Mover
             );
 
             PartsPositions[index] = newPosition;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static float3 MoveTowards
+        (
+            float3 current,
+            float3 target,
+            double maxDistanceDelta
+        )
+        {
+            var num1 = target.x - current.x;
+            var num2 = target.y - current.y;
+            var num3 = target.z - current.z;
+            
+            var d = (double) num1 * num1 + (double) num2 * num2 + (double) num3 * num3;
+
+            if (
+                d == 0.0
+                || maxDistanceDelta >= 0.0
+                && d <= maxDistanceDelta * maxDistanceDelta
+                )
+            {
+                return target;
+            }
+
+            var num4 = (float) Math.Sqrt(d);
+            
+            return new float3
+            (
+                (float)(current.x + num1 / num4 * maxDistanceDelta), 
+                (float)(current.y + num2 / num4 * maxDistanceDelta),
+                (float)(current.z + num3 / num4 * maxDistanceDelta)
+            );
         }
     }
 }

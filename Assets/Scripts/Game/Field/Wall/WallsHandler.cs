@@ -5,7 +5,7 @@ namespace Game.Field.Wall
     using UnityEngine;
 
     [Serializable]
-    public class WallSpawner
+    public class WallsHandler
     {
         [SerializeField]
         private Wall wallPrefab;
@@ -24,11 +24,11 @@ namespace Game.Field.Wall
             InstantiateWalls();
         }
 
-        public void Setup()
+        public void UpdateWalls()
         {
             foreach (var wall in _walls)
             {
-                wall.Setup(_field.Snake.Head);
+                wall.UpdateTargetPosition(_field.Snake.HeadPosition);
             }
         }
         

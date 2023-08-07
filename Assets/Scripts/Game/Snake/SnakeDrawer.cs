@@ -9,25 +9,34 @@ namespace Game.Snake
         [SerializeField]
         private GameObject partPrefab;
         
-        private SnakeGrower _grower;
+        private SnakePartsPosesHandler _partsPosesHandler;
 
         private Mesh _mesh;
 
         private Material _material;
+
+        private Matrix4x4 _scaleMatrix;
         
-        public void Construct(SnakeGrower grower)
+        public void Construct(SnakePartsPosesHandler partsPosesHandler)
         {
-            _grower = grower;
+            _partsPosesHandler = partsPosesHandler;
             
             _mesh = partPrefab.GetComponent<MeshFilter>().sharedMesh;
             _material = partPrefab.GetComponent<MeshRenderer>().sharedMaterial;
+            _scaleMatrix = Matrix4x4.Scale(partPrefab.transform.localScale);
         }
         
         public void Draw()
         {
-            foreach (var part in _grower.Parts)
+            for (var i = 0; i < _partsPosesHandler.PartsPositions.Length; i++)
             {
-                var matrix = Matrix4x4.TRS(part.Position, part.Rotation, Vector3.one * 0.9f);
+                var position = _partsPosesHandler.PartsPositions[i];
+                var rotation = _partsPosesHandler.PartsRotations[i];
+                
+                var translateMatrix = Matrix4x4.Translate(position);
+                var rotationMatrix = Matrix4x4.Rotate(rotation);
+                
+                var matrix = translateMatrix * rotationMatrix * _scaleMatrix;
                 
                 Graphics.DrawMesh(_mesh, matrix, _material, 0);
             }

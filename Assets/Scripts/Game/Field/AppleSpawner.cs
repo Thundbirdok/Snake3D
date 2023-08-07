@@ -82,7 +82,7 @@ namespace Game.Field
 
         private bool IsInsideSnake(Vector3 appleLocalPosition)
         {
-            return _field.Snake.PartsTarget?.Any(part => part.Position == appleLocalPosition) ?? false;
+            return _field.Snake.PartsTargetPositions?.Any(position => position.Equals(appleLocalPosition)) ?? false;
         }
     }
 }

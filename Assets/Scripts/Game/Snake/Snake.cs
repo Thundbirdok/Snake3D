@@ -1,34 +1,19 @@
 namespace Game.Snake
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using Game.Snake.Mover;
+    using Unity.Mathematics;
     using UnityEngine;
 
     public class Snake : MonoBehaviour
     {
-        public event Action OnPartAdded;
         public event Action OnNewPositionSet;
 
         public bool IsActive { get; set; }
         
-        public Vector3 Forward => DirectionController.Forward;
-        public Vector3 Up => DirectionController.Up;
-        public Vector3 Right => DirectionController.Right;
-
-        public float MoveDelay => snakeMover.Delay;
-        
-        public IReadOnlyList<SnakePartPose> Parts => grower.Parts;
-        public List<SnakePartPose> PartsTarget => snakeMover.PartsTargetPose;
-        
-        public SnakePartPose Head => grower.Parts.First();
-        public SnakePartPose HeadTarget => PartsTarget.First();
-
-        public SnakePartPose Tail => grower.Parts.Last();
-        public SnakePartPose TailTarget => PartsTarget.Last();
-        
-        public Vector3 TailPreviousTargetPosition => snakeMover.TailPreviousTargetPosition;
+        public float3[] PartsTargetPositions => snakeMover.PartsTargetsPositions;
+        public float3 HeadTargetPosition => _partsTargetPosesHandler.HeadTargetPosition;
+        public float3 HeadPosition => partsPosesHandler.HeadPosition;
         
         [SerializeField]
         private SnakeMover snakeMover;
@@ -37,50 +22,60 @@ namespace Game.Snake
         private CameraMover cameraMover;
 
         [SerializeField]
-        private SnakeGrower grower;
+        private SnakePartsPosesHandler partsPosesHandler;
         
         [SerializeField]
         private SnakeDrawer drawer;
-        
-        [field: SerializeField]
-        public SnakeDirectionController DirectionController { get; private set; }
+
+        [SerializeField]
+        private SnakeDirectionController directionController;
 
         private bool _isInitialized;
+        
+        private PartsTargetPosesHandler _partsTargetPosesHandler;
 
         private void OnDestroy()
         {
-            DirectionController.Dispose();
+            directionController.Dispose();
             snakeMover.Dispose();
-            grower.Dispose();
+            partsPosesHandler.Dispose();
         }
 
         private void Update()
         {
-            drawer.Draw();
-        }
-
-        private void FixedUpdate()
-        {
             if (IsActive == false)
             {
+                drawer.Draw();
+                
                 return;
             }
-
+            
             var fixedDeltaTime = Time.fixedDeltaTime;
 
             if (snakeMover.IsTimeToSetNewTargetPositions(fixedDeltaTime))
             {
-                DirectionController.UpdateDirection();
-                DirectionController.TakeDirection();
+                directionController.UpdateDirection();
+                directionController.TakeDirection();
                 snakeMover.SetTargetPositions();
                 
                 OnNewPositionSet?.Invoke();
             }
 
+            snakeMover.ScheduleMoveParts();
+            drawer.Draw();
+        }
+
+        public void LateUpdate()
+        {
+            if (IsActive == false)
+            {
+                return;
+            }
+            
             snakeMover.MoveParts();
             cameraMover.Move();
         }
-
+        
         public void Setup()
         {
             if (_isInitialized == false)
@@ -88,25 +83,27 @@ namespace Game.Snake
                 Initialize();
             }
             
-            grower.Setup();
-            DirectionController.Setup();
+            partsPosesHandler.Setup();
+            _partsTargetPosesHandler.SetPartsToTargets();
+            directionController.Setup();
             snakeMover.Setup();
             cameraMover.Setup();
         }
 
-        public void Grow()
-        {
-            grower.Grow();
-            OnPartAdded?.Invoke();
-        }
+        public void Grow() => partsPosesHandler.Grow();
 
         private void Initialize()
         {
-            grower.Construct(this);
-            drawer.Construct(grower);
-            DirectionController.Construct();
-            snakeMover.Construct(this);
-            cameraMover.Construct(this);
+            IsActive = false;
+            
+            _partsTargetPosesHandler = new PartsTargetPosesHandler(partsPosesHandler, directionController);
+            
+            partsPosesHandler.Construct(_partsTargetPosesHandler);
+            directionController.Construct();
+            snakeMover.Construct(partsPosesHandler, _partsTargetPosesHandler, directionController);
+            
+            drawer.Construct(partsPosesHandler);
+            cameraMover.Construct(partsPosesHandler, directionController, snakeMover);
 
             _isInitialized = true;
         }

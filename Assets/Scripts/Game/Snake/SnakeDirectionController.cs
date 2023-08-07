@@ -1,6 +1,7 @@
 namespace Game.Snake
 {
     using System;
+    using Unity.Mathematics;
     using UnityEngine;
 
     [Serializable]
@@ -11,13 +12,13 @@ namespace Game.Snake
         [SerializeField]
         private SnakeInputHandler snakeInputHandler;
 
-        public Vector3 Forward { get; private set; }
-        public Vector3 Up { get; private set; }
-        public Vector3 Right { get; private set; }
+        public float3 Forward { get; private set; }
+        public float3 Up { get; private set; }
+        public float3 Right { get; private set; }
         
-        private Vector3 _tmpForward;
-        private Vector3 _tmpUp;
-        private Vector3 _tmpRight;
+        private float3 _tmpForward;
+        private float3 _tmpUp;
+        private float3 _tmpRight;
     
         public void Construct()
         {
@@ -62,7 +63,7 @@ namespace Game.Snake
         {
             var newZAxis = Up * y + Right * x;
             
-            if (Forward + newZAxis == Vector3.zero)
+            if ((Forward + newZAxis).Equals(float3.zero))
             {
                 return;
             }

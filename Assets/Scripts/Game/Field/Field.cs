@@ -13,7 +13,7 @@ namespace Game.Field
         public Snake Snake { get; private set; }
         
         [field: SerializeField]
-        public WallSpawner WallSpawner { get; private set; }
+        public WallsHandler WallsHandler { get; private set; }
 
         [field: SerializeField]
         public AppleSpawner AppleSpawner { get; private set; }
@@ -24,14 +24,15 @@ namespace Game.Field
         {
             if (_isInitialized == false)
             {
-                WallSpawner.Initialize(this);
+                WallsHandler.Initialize(this);
                 AppleSpawner.Initialize(this);
                 
                 _isInitialized = true;
             }
-
-            WallSpawner.Setup();
+            
             AppleSpawner.SetToStart();
         }
+
+        private void Update() => WallsHandler.UpdateWalls();
     }
 }
