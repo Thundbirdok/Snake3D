@@ -1,6 +1,7 @@
 namespace Game.Snake
 {
     using System;
+    using Game.Snake.PartsPoses;
     using UnityEngine;
 
     [Serializable]

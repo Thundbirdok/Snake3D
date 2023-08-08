@@ -1,19 +1,19 @@
-namespace Game.Snake.Mover
+namespace Game.Snake.PartsTargetPoses
 {
     using System.Linq;
+    using Game.Snake.PartsPoses;
     using Unity.Burst;
-    using UnityEngine;
     using Unity.Collections;
     using Unity.Jobs;
     using Unity.Mathematics;
 
+    [BurstCompile]
     public class SnakePartsTargetPosesHandler
     {
         public NativeArray<float3> Positions;
         public NativeArray<quaternion> Rotations;
         
         public float3 HeadTargetPosition => Positions.First();
-        
         public float3 TailTargetPosition => Positions.Last();
         
         public float3 TailPreviousTargetPosition { get; private set; }
@@ -38,13 +38,10 @@ namespace Game.Snake.Mover
 
         ~SnakePartsTargetPosesHandler()
         {
-            Positions.Dispose();
-            Rotations.Dispose();
-            
-            _newPositions.Dispose();
-            _newRotations.Dispose();
+            DisposeArrays();
         }
         
+        [BurstCompile]
         public void SchedulePartsTargetPoses()
         {
             var head = Positions[0];
@@ -72,7 +69,7 @@ namespace Game.Snake.Mover
             };
             var rotationsJobHandle = rotationsJob.Schedule
             (
-                Positions.Length - 1,
+                Rotations.Length - 1,
                 64
             );
 
@@ -99,6 +96,7 @@ namespace Game.Snake.Mover
             );
         }
 
+        [BurstCompile]
         public void GetPartsTargetPoses()
         {
             _partsTargetPosesJobHandle.Complete();
@@ -107,43 +105,20 @@ namespace Game.Snake.Mover
             NativeArray<quaternion>.Copy(_newRotations, Rotations);
         } 
         
+        [BurstCompile]
         public void SetPartsToTargets()
         {
             _partsTargetPosesJobHandle.Complete();
             
-            Positions.Dispose();
-            Rotations.Dispose();
-            _newPositions.Dispose();
-            _newRotations.Dispose();
-            
-            Positions = new NativeArray<float3>
-            (
-                _partsPosesHandler.PartsPositions.Length,
-                Allocator.Persistent
-            );
-            
-            Rotations = new NativeArray<quaternion>
-            (
-                _partsPosesHandler.PartsRotations.Length,
-                Allocator.Persistent
-            );
+            DisposeArrays();
 
-            _newPositions = new NativeArray<float3>
-            (
-                _partsPosesHandler.PartsPositions.Length,
-                Allocator.Persistent
-            );
-            
-            _newRotations = new NativeArray<quaternion>
-            (
-                _partsPosesHandler.PartsRotations.Length,
-                Allocator.Persistent
-            );
+            SetArrays();
             
             NativeArray<float3>.Copy(_partsPosesHandler.PartsPositions, Positions);
             NativeArray<quaternion>.Copy(_partsPosesHandler.PartsRotations, Rotations);
         }
     
+        [BurstCompile]
         public void AddTargetForLastPart()
         {
             _partsTargetPosesJobHandle.Complete();
@@ -154,37 +129,14 @@ namespace Game.Snake.Mover
             var oldPartTargetPositions = Positions;
             var oldPartTargetRotations = Rotations;
             
-            Positions = new NativeArray<float3>
-            (
-                _partsPosesHandler.PartsPositions.Length, 
-                Allocator.Persistent
-            );
-            
-            Rotations = new NativeArray<quaternion>
-            (
-                _partsPosesHandler.PartsRotations.Length, 
-                Allocator.Persistent
-            );
-            
-            _newPositions = new NativeArray<float3>
-            (
-                _partsPosesHandler.PartsPositions.Length,
-                Allocator.Persistent
-            );
-            
-            _newRotations = new NativeArray<quaternion>
-            (
-                _partsPosesHandler.PartsRotations.Length,
-                Allocator.Persistent
-            );
-            
+            SetArrays();
+
             NativeArray<float3>.Copy
             (
                 oldPartTargetPositions,
                 Positions,
                 oldPartTargetPositions.Length
             );
-            
             Positions[oldPartTargetPositions.Length] = _partsPosesHandler.TailPosition;
             
             NativeArray<quaternion>.Copy
@@ -193,85 +145,46 @@ namespace Game.Snake.Mover
                 Rotations,
                 oldPartTargetPositions.Length
             );
-            
             Rotations[oldPartTargetPositions.Length] = _partsPosesHandler.TailRotation;
 
             oldPartTargetPositions.Dispose();
             oldPartTargetRotations.Dispose();
         }
-        
-        [BurstCompile]
-        public struct SetPartsTargetPositionsJob : IJobParallelFor
-        {
-            [ReadOnly]
-            public NativeArray<float3> OldPositions;
-            
-            [WriteOnly, NativeDisableParallelForRestriction]
-            public NativeArray<float3> NewPositions;
-            
-            [BurstCompile]
-            public void Execute(int index)
-            {
-                NewPositions[index + 1] = OldPositions[index];
-            }
-        }
-        
-        [BurstCompile]
-        public struct SetPartsTargetRotationsJob : IJobParallelFor
-        {
-            [ReadOnly]
-            public NativeArray<quaternion> OldRotations;
-            
-            [WriteOnly, NativeDisableParallelForRestriction]
-            public NativeArray<quaternion> NewRotations;
-            
-            [BurstCompile]
-            public void Execute(int index)
-            {
-                NewRotations[index + 1] = OldRotations[index];
-            }
-        }
-        
-        [BurstCompile]
-        public struct SetHeadTargetPositionJob : IJob
-        {
-            [ReadOnly]
-            public float3 OldHeadPosition;
-            
-            [ReadOnly]
-            public float3 Forward;
 
-            [WriteOnly, NativeDisableParallelForRestriction]
-            public NativeArray<float3> NewPositions;
-            
-            [BurstCompile]
-            public void Execute()
-            {
-                NewPositions[0] = OldHeadPosition + Forward;
-            }
-        }
-        
         [BurstCompile]
-        public struct SetHeadTargetRotationJob : IJob
+        private void SetArrays()
         {
-            [ReadOnly]
-            public float3 Forward;
+            Positions = new NativeArray<float3>
+            (
+                _partsPosesHandler.PartsPositions.Length,
+                Allocator.Persistent
+            );
 
-            [ReadOnly]
-            public float3 Up;
-            
-            [WriteOnly, NativeDisableParallelForRestriction]
-            public NativeArray<quaternion> NewRotations;
-            
-            [BurstCompile]
-            public void Execute()
-            {
-                NewRotations[0] = Quaternion.LookRotation
-                (
-                    Forward,
-                    Up
-                );
-            }
+            Rotations = new NativeArray<quaternion>
+            (
+                _partsPosesHandler.PartsRotations.Length,
+                Allocator.Persistent
+            );
+
+            _newPositions = new NativeArray<float3>
+            (
+                _partsPosesHandler.PartsPositions.Length,
+                Allocator.Persistent
+            );
+
+            _newRotations = new NativeArray<quaternion>
+            (
+                _partsPosesHandler.PartsRotations.Length,
+                Allocator.Persistent
+            );
+        }
+
+        private void DisposeArrays()
+        {
+            Positions.Dispose();
+            Rotations.Dispose();
+            _newPositions.Dispose();
+            _newRotations.Dispose();
         }
     }
 }

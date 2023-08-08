@@ -1,7 +1,6 @@
 namespace Effects
 {
     using System;
-    using Game.Snake.Mover;
     using Unity.Mathematics;
     using UnityEngine;
     

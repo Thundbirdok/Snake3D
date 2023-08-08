@@ -2,7 +2,7 @@ namespace Game.Snake
 {
     using System;
     using Cinemachine;
-    using Game.Snake.Mover;
+    using Game.Snake.PartsPoses;
     using UnityEngine;
 
     [Serializable]
@@ -16,18 +16,18 @@ namespace Game.Snake
 
         private SnakePartsPosesHandler _partsPosesHandler;
         private SnakeDirectionController _directionController;
-        private SnakeMover _snakeMover;
+        private SnakePartsMover _snakePartsMover;
         
         public void Construct
         (
             SnakePartsPosesHandler partsPosesHandler,
             SnakeDirectionController directionController,
-            SnakeMover snakeMover
+            SnakePartsMover snakePartsMover
         )
         {
             _partsPosesHandler = partsPosesHandler;
             _directionController = directionController;
-            _snakeMover = snakeMover;
+            _snakePartsMover = snakePartsMover;
         }
 
         public void Setup() => SetCameraNearHead();
@@ -38,14 +38,14 @@ namespace Game.Snake
             (
                 cameraTarget.localPosition,
                 _partsPosesHandler.HeadPosition + _directionController.Forward,
-                Time.fixedDeltaTime / _snakeMover.Delay
+                Time.fixedDeltaTime / _snakePartsMover.Delay
             );
 
             cameraTarget.localRotation = Quaternion.RotateTowards
             (
                 cameraTarget.localRotation, 
                 _partsPosesHandler.HeadRotation,
-                Time.fixedDeltaTime / _snakeMover.Delay * 180
+                Time.fixedDeltaTime / _snakePartsMover.Delay * 180
             );
         }
 

@@ -1,9 +1,9 @@
-namespace Game.Snake
+namespace Game.Snake.PartsPoses
 {
     using System;
     using System.Linq;
     using Game.Field;
-    using Game.Snake.Mover;
+    using Game.Snake.PartsTargetPoses;
     using Unity.Collections;
     using Unity.Mathematics;
     using UnityEngine;

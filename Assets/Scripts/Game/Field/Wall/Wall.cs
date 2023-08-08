@@ -1,7 +1,6 @@
 namespace Game.Field.Wall
 {
     using Effects;
-    using Game.Snake.Mover;
     using Unity.Mathematics;
     using UnityEngine;
 
