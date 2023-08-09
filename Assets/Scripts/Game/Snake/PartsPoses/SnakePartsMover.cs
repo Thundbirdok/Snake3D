@@ -4,6 +4,7 @@ namespace Game.Snake.PartsPoses
     using Game.Snake.PartsTargetPoses;
     using Unity.Burst;
     using Unity.Jobs;
+    using Unity.Jobs.LowLevel.Unsafe;
     using UnityEngine;
     using Utility;
 
@@ -81,14 +82,14 @@ namespace Game.Snake.PartsPoses
                 PartsTargetPositions = _partsTargetPosesHandler.Positions,
                 PartsPositions = _partsPosesHandler.PartsPositions,
                 Delta = delta
-            }.Schedule(_partsTargetPosesHandler.Positions.Length, 64);
-
+            }.Schedule(_partsTargetPosesHandler.Positions.Length, JobsUtility.JobWorkerMaximumCount / 2);
+            
             _rotationJob = new MoveRotationToTargetJob()
             {
                 PartsTargetRotations = _partsTargetPosesHandler.Rotations,
                 PartsRotations = _partsPosesHandler.PartsRotations,
                 Delta = delta
-            }.Schedule(_partsTargetPosesHandler.Rotations.Length, 64);
+            }.Schedule(_partsTargetPosesHandler.Rotations.Length, JobsUtility.JobWorkerMaximumCount / 2);
         }
 
         [BurstCompile]

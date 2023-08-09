@@ -4,11 +4,12 @@ namespace Game.Snake.PartsPoses
     using System.Linq;
     using Game.Field;
     using Game.Snake.PartsTargetPoses;
+    using Unity.Burst;
     using Unity.Collections;
     using Unity.Mathematics;
     using UnityEngine;
 
-    [Serializable]
+    [Serializable, BurstCompile]
     public class SnakePartsPosesHandler
     {
         public event Action OnPartAdded;
@@ -46,6 +47,7 @@ namespace Game.Snake.PartsPoses
             SetupParts();
         }
 
+        [BurstCompile]
         public void Grow()
         {
             var tailPreviousTargetPosition = _targetPosesHandler.TailPreviousTargetPosition;
@@ -59,12 +61,14 @@ namespace Game.Snake.PartsPoses
             OnPartAdded?.Invoke();
         }
 
+        [BurstCompile]
         public void SetNewPoses(NativeArray<float3> positions, NativeArray<quaternion> rotations)
         {
             NativeArray<float3>.Copy(positions, PartsPositions);
             NativeArray<quaternion>.Copy(rotations, PartsRotations);
         }
         
+        [BurstCompile]
         private void SetupParts()
         {
             var xPartPosition = (float)field.Size.x / 2 - (field.Size.x % 2 == 0 ? 0.5f : 0);
@@ -95,6 +99,7 @@ namespace Game.Snake.PartsPoses
             }
         }
 
+        [BurstCompile]
         private void ClearParts()
         {
             if (PartsPositions.IsCreated == false)
@@ -108,39 +113,35 @@ namespace Game.Snake.PartsPoses
             }
         }
 
+        [BurstCompile]
         private void Grow(Vector3 position, Quaternion rotation)
         {
-            var oldPartPosition = PartsPositions;
-            var oldPartRotation = PartsRotations;
+            GrowArray(ref PartsPositions, position);
+            GrowArray(ref PartsRotations, rotation);
+        }
+
+        [BurstCompile]
+        private void GrowArray<T>(ref NativeArray<T> array, T tail) where T : struct
+        {
+            var oldArray = array;
             
-            PartsPositions = new NativeArray<float3>(oldPartPosition.Length + 1, Allocator.Persistent);
-            PartsRotations = new NativeArray<quaternion>(oldPartRotation.Length + 1, Allocator.Persistent);
-
-            if (oldPartPosition.IsCreated)
+            array = new NativeArray<T>(oldArray.Length + 1, Allocator.Persistent);
+            
+            if (oldArray.IsCreated == false)
             {
-                if (oldPartPosition.Length > 0)
-                {
-                    NativeArray<float3>.Copy
-                        (oldPartPosition, PartsPositions, oldPartPosition.Length);
-
-                    PartsPositions[oldPartPosition.Length] = position;
-                }
+                array[0] = tail;
                 
-                oldPartPosition.Dispose();
+                return;
             }
 
-            if (oldPartPosition.IsCreated)
+            if (oldArray.Length > 0)
             {
-                if (oldPartPosition.Length > 0)
-                {
-                    NativeArray<quaternion>.Copy
-                        (oldPartRotation, PartsRotations, oldPartPosition.Length);
-
-                    PartsRotations[oldPartRotation.Length] = rotation;
-                }
-
-                oldPartRotation.Dispose();
+                NativeArray<T>.Copy(oldArray, array, oldArray.Length);
             }
+            
+            array[oldArray.Length] = tail;
+                
+            oldArray.Dispose();
         }
     }
 }
