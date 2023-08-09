@@ -47,7 +47,7 @@ namespace Game.States
         private void CheckAppleHit()
         {
             var appleLocalPosition = field.AppleSpawner.Apple.localPosition;
-            var snakeHeadTargetPosition = snake.HeadTarget.Position;
+            var snakeHeadTargetPosition = snake.HeadTargetPosition;
             
             if (Mathf.Abs(appleLocalPosition.x - snakeHeadTargetPosition.x) > 0.1f)
             {
@@ -70,7 +70,7 @@ namespace Game.States
 
         private bool IsWallsHit()
         {
-            var snakeHeadTargetPosition = snake.HeadTarget.Position;
+            var snakeHeadTargetPosition = snake.HeadTargetPosition;
             
             if (snakeHeadTargetPosition.x < 0.5f)
             {
@@ -107,12 +107,12 @@ namespace Game.States
 
         private bool IsSnakeHit()
         {
-            for (var i = 1; i < snake.PartsTarget.Count; i++)
+            for (var i = 1; i < snake.PartsTargetPositions.Length; i++)
             {
-                var headTargetPosition = snake.HeadTarget.Position;
-                var partTargetPosition = snake.PartsTarget[i].Position;
+                var headTargetPosition = snake.HeadTargetPosition;
+                var partTargetPosition = snake.PartsTargetPositions[i];
 
-                if (headTargetPosition == partTargetPosition)
+                if (headTargetPosition.Equals(partTargetPosition))
                 {
                     return true;
                 }

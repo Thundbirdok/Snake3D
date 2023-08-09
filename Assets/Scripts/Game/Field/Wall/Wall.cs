@@ -1,7 +1,7 @@
 namespace Game.Field.Wall
 {
     using Effects;
-    using Game.Snake.Mover;
+    using Unity.Mathematics;
     using UnityEngine;
 
     public class Wall : MonoBehaviour
@@ -10,9 +10,7 @@ namespace Game.Field.Wall
         private WallShaderController shaderController;
         
         public void Initialize() => shaderController.Initialize();
-
-        public void Setup(SnakePartPose targetForShader) => shaderController.Setup(targetForShader);
         
-        private void Update() => shaderController.UpdateTargetPosition();
+        public void UpdateTargetPosition(float3 targetForShader) => shaderController.UpdateTargetPosition(targetForShader);
     }
 }

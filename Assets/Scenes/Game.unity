@@ -303,7 +303,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Size>k__BackingField: {x: 10, y: 10, z: 10}
   <Snake>k__BackingField: {fileID: 1822188185}
-  <WallSpawner>k__BackingField:
+  <WallsHandler>k__BackingField:
     wallPrefab: {fileID: 4245745267574250282, guid: 3b3e97994d10d7f4bafc84a62e6771f3,
       type: 3}
     container: {fileID: 230307915}
@@ -2307,20 +2307,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97b513f6dff0df54e9eb80c316758c12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  snakeMover:
+  snakePartsMover:
     timer:
       <Duration>k__BackingField: 0.5
     moveTime: 0.125
   cameraMover:
     cameraTarget: {fileID: 1877029916}
     virtualCamera: {fileID: 686062129}
-  grower:
+  partsPosesHandler:
     field: {fileID: 230307914}
     startPartsNumber: 3
   drawer:
     partPrefab: {fileID: 4164054200232900496, guid: c3d16dfb924db8c469533b030866b51f,
       type: 3}
-  <DirectionController>k__BackingField:
+  directionController:
     snakeInputHandler: {fileID: 1247984558}
 --- !u!1 &1825489486
 GameObject:

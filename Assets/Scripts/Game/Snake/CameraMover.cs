@@ -2,6 +2,7 @@ namespace Game.Snake
 {
     using System;
     using Cinemachine;
+    using Game.Snake.PartsPoses;
     using UnityEngine;
 
     [Serializable]
@@ -13,29 +14,52 @@ namespace Game.Snake
         [SerializeField]
         private CinemachineVirtualCamera virtualCamera;
 
-        private Snake _snake;
-
-        public void Construct(Snake snake)
-        {
-            _snake = snake;
-        }
-
-        public void Setup()
-        {
-            SetCameraNearHead();
-        }
+        private SnakePartsPosesHandler _partsPosesHandler;
+        private SnakeDirectionController _directionController;
+        private SnakePartsMover _snakePartsMover;
         
+        public void Construct
+        (
+            SnakePartsPosesHandler partsPosesHandler,
+            SnakeDirectionController directionController,
+            SnakePartsMover snakePartsMover
+        )
+        {
+            _partsPosesHandler = partsPosesHandler;
+            _directionController = directionController;
+            _snakePartsMover = snakePartsMover;
+        }
+
+        public void Setup() => SetCameraNearHead();
+
+        public void Move()
+        {
+            cameraTarget.localPosition = Vector3.MoveTowards
+            (
+                cameraTarget.localPosition,
+                _partsPosesHandler.HeadPosition + _directionController.Forward,
+                Time.fixedDeltaTime / _snakePartsMover.Delay
+            );
+
+            cameraTarget.localRotation = Quaternion.RotateTowards
+            (
+                cameraTarget.localRotation, 
+                _partsPosesHandler.HeadRotation,
+                Time.fixedDeltaTime / _snakePartsMover.Delay * 180
+            );
+        }
+
         private void SetCameraNearHead()
         {
-            if (_snake == null)
+            if (_partsPosesHandler == null)
             {
                 return;
             }
 
-            var cameraTargetPosition = _snake.Head.Position;
-            var localTargetRotation = _snake.Head.Rotation;
+            var cameraTargetPosition = _partsPosesHandler.HeadPosition;
+            var localTargetRotation = _partsPosesHandler.HeadRotation;
             
-            var delta = cameraTarget.localPosition - cameraTargetPosition;
+            var delta = cameraTarget.localPosition - (Vector3)cameraTargetPosition;
 
             cameraTarget.localPosition = cameraTargetPosition;
             cameraTarget.localRotation = localTargetRotation;
@@ -43,23 +67,6 @@ namespace Game.Snake
             virtualCamera.PreviousStateIsValid = false;
             
             virtualCamera.OnTargetObjectWarped(cameraTarget, delta);
-        }
-
-        public void Move()
-        {
-            cameraTarget.localPosition = Vector3.MoveTowards
-            (
-                cameraTarget.localPosition,
-                _snake.Head.Position + _snake.Forward,
-                Time.fixedDeltaTime / _snake.MoveDelay
-            );
-
-            cameraTarget.localRotation = Quaternion.RotateTowards
-            (
-                cameraTarget.localRotation, 
-                _snake.Head.Rotation,
-                Time.fixedDeltaTime / _snake.MoveDelay * 180
-            );
         }
     }
 }
